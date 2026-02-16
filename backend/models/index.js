@@ -315,6 +315,7 @@
 // };
 
 const mongoose = require('mongoose');
+   const Emission = require('./Emission');
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -684,5 +685,6 @@ module.exports = {
   User,
   Program,
   Episode,
-  Podcast
+  Podcast,
+  Emission
 };

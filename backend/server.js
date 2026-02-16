@@ -143,6 +143,9 @@ require('dotenv').config();
 // 🔥 Import metadata service
 const { startStreamMetadata, getCurrentSong } = require('./services/streamMetadata');
 
+const emissionRoutes = require('./routes/emissionRoutes');
+   const statsRoutes = require('./routes/statsRoutes');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, {
@@ -184,8 +187,8 @@ io.on('connection', (socket) => {
     console.log('❌ User disconnected:', socket.id);
   });
 });
-
-
+  app.use('/api/emissions', emissionRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -195,6 +198,13 @@ app.use('/api/podcasts', require('./routes/podcasts'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/history', require('./routes/history')); // ✅ Nouvelle route
 app.use('/api/stream', require('./routes/streamRoutes')); // ✅ Nouvelle route
+app.use('/api/admin/history', require('./routes/adminHistoryRoutes'));
+
+app.use('/api/combined-history', require('./routes/combinedHistoryRoutes'));
+app.use('/api/emissions', require('./routes/emissionRoutes'));
+app.use('/api/stats', require('./routes/statsRoutes'));
+
+
 
 // Health check
 app.get('/api/health', (req, res) => {
