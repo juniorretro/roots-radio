@@ -3,7 +3,7 @@
 // const getCoverFromITunes = async (artist, title) => {
 //   try {
 //     const query = encodeURIComponent(`${artist} ${title}`);
-//     const url = `https://itunes.apple.com/search?term=${query}&media=music&limit=1`;
+//     const url = `http://itunes.apple.com/search?term=${query}&media=music&limit=1`;
 
 //     const { data } = await axios.get(url);
 
@@ -40,7 +40,7 @@ const getCoverFromITunes = async (artist, title) => {
     }
 
     const query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`);
-    const url = `https://itunes.apple.com/search?term=${query}&media=music&limit=1`;
+    const url = `http://itunes.apple.com/search?term=${query}&media=music&limit=1`;
 
     console.log(`🔍 Searching iTunes for: "${cleanArtist} - ${cleanTitle}"`);
 
