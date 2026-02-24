@@ -231,6 +231,7 @@ router.put('/:id', [
     res.status(500).json({ message: 'Server error' });
   }
 });
+// const { adminAuth } = require('../middleware/auth'); 
 
 // Delete episode (admin only)
 router.delete('/:id', adminAuth, async (req, res) => {

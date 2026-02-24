@@ -1,4 +1,3 @@
-// scripts/seed.js - Script pour initialiser la base de données avec des données de test
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
@@ -167,15 +166,26 @@ const clearDatabase = async () => {
 };
 
 // Fonction pour créer les utilisateurs
+// const createUsers = async () => {
+//   try {
+//     const users = await User.create(seedData.users);
+//     console.log(`Created ${users.length} users`);
+//     return users;
+//   } catch (error) {
+//     console.error('Error creating users:', error);
+//     throw error;
+//   }
+// };
+
+
 const createUsers = async () => {
-  try {
-    const users = await User.create(seedData.users);
-    console.log(`Created ${users.length} users`);
-    return users;
-  } catch (error) {
-    console.error('Error creating users:', error);
-    throw error;
-  }
+  const usersWithHashedPasswords = await Promise.all(
+    seedData.users.map(async (user) => ({
+      ...user,
+      password: await bcrypt.hash(user.password, 12) // ← HASHER
+    }))
+  );
+  return User.create(usersWithHashedPasswords);
 };
 
 // Fonction pour créer les programmes
