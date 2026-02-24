@@ -180,7 +180,7 @@ const createUsers = async () => {
     console.log('👥 Creating users...');
     
     // Vérifier si l'admin existe déjà
-    let adminUser = await User.findOne({ email: 'admin@radio.com' });
+    let adminUser = await User.findOne({ email: 'roots@radio.com' });
     if (!adminUser) {
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash('admin123', salt);
@@ -189,14 +189,14 @@ const createUsers = async () => {
         username: 'admin',
         firstName: 'Admin',
         lastName: 'Système',
-        email: 'admin@radio.com',
+        email: 'roots@radio.com',
         password: hashedPassword,
         role: 'admin',
         newsletter: false
       });
       
       await adminUser.save();
-      console.log('  ✅ Admin user created (email: admin@radio.com, password: admin123)');
+      console.log('  ✅ Admin user created (email: roots@radio.com, password: admin123)');
     } else {
       console.log('  ℹ️  Admin user already exists');
     }
@@ -468,7 +468,7 @@ const initializeDatabase = async () => {
     }
     console.log('================================');
     console.log('🔐 IDENTIFIANTS DE CONNEXION:');
-    console.log('Admin: admin@radio.com / admin123');
+    console.log('Admin: roots@radio.com / admin123');
     console.log('User: user@radio.com / password123');
     console.log('================================');
     

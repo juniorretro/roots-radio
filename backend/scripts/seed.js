@@ -24,7 +24,7 @@ const seedData = {
   users: [
     {
       name: 'Administrateur',
-      email: 'admin@rootsmusicradio.com',
+      email: 'roots@radio.com',
       password: 'admin123',
       role: 'admin'
     },

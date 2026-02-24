@@ -1,4 +1,3 @@
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,22 +8,42 @@ const fs = require('fs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
+const afficheRoutes = require('./routes/affiches');
+
 require('dotenv').config();
+
+// ─────────────────────────────────────────────
+// 0. VALIDATION DES VARIABLES D'ENVIRONNEMENT
+// ─────────────────────────────────────────────
+const requiredEnvVars = ['JWT_SECRET', 'MONGO_URI'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`❌ Variable d'environnement manquante: ${envVar}`);
+    process.exit(1);
+  }
+}
+
+if (process.env.JWT_SECRET.length < 32) {
+  console.error('❌ JWT_SECRET trop court (minimum 32 caractères requis)');
+  process.exit(1);
+}
+
+const isDev = process.env.NODE_ENV !== 'production';
 
 // Services
 const { startStreamMetadata, getCurrentSong } = require('./services/streamMetadata');
 
 // Routes
-const emissionRoutes      = require('./routes/emissionRoutes');
-const statsRoutes         = require('./routes/statsRoutes');
-const authRoutes          = require('./routes/auth');
-const programRoutes       = require('./routes/programs');
-const episodeRoutes       = require('./routes/episodes');
-const podcastRoutes       = require('./routes/podcasts');
-const uploadRoutes        = require('./routes/upload');
-const historyRoutes       = require('./routes/history');
-const streamRoutes        = require('./routes/streamRoutes');
-const adminHistoryRoutes  = require('./routes/adminHistoryRoutes');
+const emissionRoutes        = require('./routes/emissionRoutes');
+const statsRoutes           = require('./routes/statsRoutes');
+const authRoutes            = require('./routes/auth');
+const programRoutes         = require('./routes/programs');
+const episodeRoutes         = require('./routes/episodes');
+const podcastRoutes         = require('./routes/podcasts');
+const uploadRoutes          = require('./routes/upload');
+const historyRoutes         = require('./routes/history');
+const streamRoutes          = require('./routes/streamRoutes');
+const adminHistoryRoutes    = require('./routes/adminHistoryRoutes');
 const combinedHistoryRoutes = require('./routes/combinedHistoryRoutes');
 
 // ─────────────────────────────────────────────
@@ -32,70 +51,76 @@ const combinedHistoryRoutes = require('./routes/combinedHistoryRoutes');
 // ─────────────────────────────────────────────
 const app    = express();
 const server = http.createServer(app);
-const io     = socketIO(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
-});
 
 // ─────────────────────────────────────────────
-// 1. SÉCURITÉ — Headers HTTP
-//    (helmet UNE SEULE FOIS, en premier)
-// ─────────────────────────────────────────────
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' } // permet les uploads d'images
-}));
-
-// ─────────────────────────────────────────────
-// 2. CORS — restreint à ton frontend uniquement
+// 1. CORS — doit être AVANT tout le reste
 // ─────────────────────────────────────────────
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
   .split(',')
   .map(o => o.trim());
 
+// En développement : accepter aussi localhost:3001 et 3000
+if (isDev) {
+  ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'].forEach(o => {
+    if (!allowedOrigins.includes(o)) allowedOrigins.push(o);
+  });
+}
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Autoriser les requêtes sans origin (ex: Postman, mobile)
+    // Autoriser les requêtes sans origin (Postman, mobile, etc.)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn(`⚠️  CORS bloqué pour: ${origin}`);
     callback(new Error(`CORS bloqué pour l'origine: ${origin}`));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Gérer les requêtes OPTIONS (preflight) explicitement
+app.options('*', cors());
+
 // ─────────────────────────────────────────────
-// 3. RATE LIMITING — anti brute-force & DDoS
-//    (UNE SEULE fois par route)
+// 2. SÉCURITÉ — Headers HTTP
+// ─────────────────────────────────────────────
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+
+// ─────────────────────────────────────────────
+// 3. PARSERS & SANITIZATION
+// ─────────────────────────────────────────────
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(mongoSanitize());
+
+// ─────────────────────────────────────────────
+// 4. RATE LIMITING
+//    En dev : limites très souples pour ne pas bloquer les tests
+//    En prod : limites strictes
 // ─────────────────────────────────────────────
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 10000 : 100,      // ← 10000 en dev, 100 en prod
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isDev,              // ← skip complètement en dev
   message: { success: false, message: 'Trop de requêtes, réessayez dans 15 minutes.' }
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5, // 5 tentatives de login par 15 min
+  max: isDev ? 1000 : 10,         // ← 1000 en dev, 10 en prod (était 5, trop peu)
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isDev,              // ← skip complètement en dev
   message: { success: false, message: 'Trop de tentatives de connexion, réessayez dans 15 minutes.' }
 });
 
 app.use('/api/', globalLimiter);
 app.use('/api/auth/login', authLimiter);
-
-// ─────────────────────────────────────────────
-// 4. PARSERS & SANITIZATION
-// ─────────────────────────────────────────────
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(mongoSanitize()); // protège contre les injections NoSQL
 
 // ─────────────────────────────────────────────
 // 5. FICHIERS STATIQUES
@@ -107,20 +132,31 @@ if (!fs.existsSync(uploadDir)) {
 app.use('/uploads', express.static(uploadDir));
 
 // ─────────────────────────────────────────────
-// 6. BASE DE DONNÉES
+// 6. SOCKET.IO
 // ─────────────────────────────────────────────
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/radio')
+const io = socketIO(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// ─────────────────────────────────────────────
+// 7. BASE DE DONNÉES
+// ─────────────────────────────────────────────
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    startStreamMetadata(io); // démarrer APRÈS la connexion DB
+    startStreamMetadata(io);
   })
   .catch(err => {
     console.error('❌ MongoDB connection error:', err.message);
-    process.exit(1); // quitter si la DB est inaccessible
+    process.exit(1);
   });
 
 // ─────────────────────────────────────────────
-// 7. SOCKET.IO
+// 8. SOCKET.IO EVENTS
 // ─────────────────────────────────────────────
 io.on('connection', (socket) => {
   console.log('🔌 User connected:', socket.id);
@@ -131,32 +167,27 @@ io.on('connection', (socket) => {
   });
 });
 
-// Rendre io accessible dans les routes
 app.set('io', io);
 
 // ─────────────────────────────────────────────
-// 8. ROUTES PUBLIQUES (santé)
+// 9. ROUTES PUBLIQUES (santé)
 // ─────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     status: 'OK',
     time: new Date(),
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || 'development',
     currentSong: getCurrentSong()
   });
 });
 
 app.get('/api/now-playing', (req, res) => {
-  res.json({
-    success: true,
-    nowPlaying: getCurrentSong()
-  });
+  res.json({ success: true, nowPlaying: getCurrentSong() });
 });
 
 // ─────────────────────────────────────────────
-// 9. ROUTES API
-//    (chaque route UNE SEULE fois)
+// 10. ROUTES API
 // ─────────────────────────────────────────────
 app.use('/api/auth',             authRoutes);
 app.use('/api/programs',         programRoutes);
@@ -169,13 +200,11 @@ app.use('/api/admin/history',    adminHistoryRoutes);
 app.use('/api/combined-history', combinedHistoryRoutes);
 app.use('/api/emissions',        emissionRoutes);
 app.use('/api/stats',            statsRoutes);
+app.use('/api/affiches',         afficheRoutes);
 
 // ─────────────────────────────────────────────
-// 10. GESTIONNAIRES D'ERREURS
-//     (toujours EN DERNIER, après toutes les routes)
+// 11. GESTIONNAIRES D'ERREURS
 // ─────────────────────────────────────────────
-
-// 404 — route non trouvée
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -183,12 +212,8 @@ app.use((req, res) => {
   });
 });
 
-// 500 — erreur globale
 app.use((err, req, res, next) => {
   console.error('❌ Erreur serveur:', err.message);
-
-  // Ne jamais exposer les détails d'erreur en production
-  const isDev = process.env.NODE_ENV === 'development';
   res.status(err.statusCode || 500).json({
     success: false,
     message: isDev ? err.message : 'Erreur serveur interne',
@@ -197,23 +222,21 @@ app.use((err, req, res, next) => {
 });
 
 // ─────────────────────────────────────────────
-// 11. DÉMARRAGE DU SERVEUR
+// 12. DÉMARRAGE DU SERVEUR
 // ─────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+  console.log(`🌐 CORS autorisé pour: ${allowedOrigins.join(', ')}`);
 });
 
 // ─────────────────────────────────────────────
-// 12. NETTOYAGE AUTOMATIQUE (optionnel)
+// 13. NETTOYAGE AUTOMATIQUE
 // ─────────────────────────────────────────────
 if (process.env.AUTO_CLEAN_HISTORY === 'true') {
-  // node-schedule n'est pas dans tes dépendances → utiliser setInterval
   const PlayHistory = require('./models/playHistory');
   const Emission    = require('./models/Emission');
 
-  // Toutes les 24h
-  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
   setInterval(async () => {
     console.log('🧹 Running automatic history cleanup...');
     try {
@@ -222,20 +245,19 @@ if (process.env.AUTO_CLEAN_HISTORY === 'true') {
     } catch (error) {
       console.error('❌ Auto cleanup error:', error.message);
     }
-  }, TWENTY_FOUR_HOURS);
+  }, 24 * 60 * 60 * 1000);
 }
 
 // ─────────────────────────────────────────────
-// 13. GESTION DES ERREURS PROCESS (anti-crash)
+// 14. GESTION DES ERREURS PROCESS
 // ─────────────────────────────────────────────
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason) => {
   console.error('❌ Unhandled Rejection:', reason);
-  // Ne pas quitter le process mais logger l'erreur
 });
 
 process.on('uncaughtException', (err) => {
   console.error('❌ Uncaught Exception:', err.message);
-  process.exit(1); // Quitter proprement pour que PM2 redémarre
+  process.exit(1);
 });
 
-module.exports = { app, server }; // utile pour les tests
+module.exports = { app, server };

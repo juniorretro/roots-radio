@@ -22,7 +22,7 @@ const verifyLogin = async () => {
     console.log('Connexion à MongoDB réussie');
 
     // Test avec les identifiants admin
-    const testEmail = 'admin@radio.com';
+    const testEmail = 'roots@radio.com';
     const testPassword = 'password123';
 
     console.log(`\n🔍 Recherche de l'utilisateur avec email: ${testEmail}`);
