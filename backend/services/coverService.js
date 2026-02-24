@@ -1,24 +1,4 @@
-// const axios = require('axios');
 
-// const getCoverFromITunes = async (artist, title) => {
-//   try {
-//     const query = encodeURIComponent(`${artist} ${title}`);
-//     const url = `http://itunes.apple.com/search?term=${query}&media=music&limit=1`;
-
-//     const { data } = await axios.get(url);
-
-//     if (data.results && data.results.length > 0) {
-//       return data.results[0].artworkUrl100.replace('100x100', '600x600');
-//     }
-
-//     return null;
-//   } catch (err) {
-//     console.error('iTunes cover error:', err.message);
-//     return null;
-//   }
-// };
-
-// module.exports = { getCoverFromITunes };
 
 const axios = require('axios');
 

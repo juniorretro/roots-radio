@@ -6,13 +6,15 @@ const {
   calculateMusicConfidenceScore 
 } = require('../services/adFilter');
 const PlayHistory = require('../models/playHistory');
+const { adminAuth } = require('../middleware/auth');
+
 
 /**
  * @route   POST /api/admin/history/clean-ads
  * @desc    Nettoyer l'historique des publicités
  * @access  Private (Admin)
  */
-router.post('/clean-ads', async (req, res) => {
+router.post('/clean-ads', adminAuth, async (req, res) => {
   try {
     // TODO: Ajouter middleware auth admin
     
@@ -37,7 +39,7 @@ router.post('/clean-ads', async (req, res) => {
  * @desc    Ajouter un mot-clé à la liste noire
  * @access  Private (Admin)
  */
-router.post('/add-blacklist', async (req, res) => {
+router.post('/add-blacklist', adminAuth, async (req, res) => {
   try {
     const { keyword, type } = req.body;
     
@@ -68,7 +70,7 @@ router.post('/add-blacklist', async (req, res) => {
  * @desc    Analyser un track pour voir son score de confiance
  * @access  Private (Admin)
  */
-router.post('/analyze-track', async (req, res) => {
+router.post('/analyze-track', adminAuth, async (req, res) => {
   try {
     const trackData = req.body;
     
@@ -100,7 +102,7 @@ router.post('/analyze-track', async (req, res) => {
  * @desc    Récupérer les tracks suspects (score faible)
  * @access  Private (Admin)
  */
-router.get('/suspicious', async (req, res) => {
+router.get('/suspicious', adminAuth, async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 50, 200);
     const minScore = parseInt(req.query.minScore) || 0;
@@ -139,7 +141,7 @@ router.get('/suspicious', async (req, res) => {
  * @desc    Supprimer manuellement un track de l'historique
  * @access  Private (Admin)
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
