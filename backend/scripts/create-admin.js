@@ -1,128 +1,128 @@
+/**
+ * createAdmin.js — Script de création de l'admin par défaut
+ * 
+ * Usage : node scripts/createAdmin.js
+ * 
+ * Crée l'utilisateur admin roots@radio.com / admin123
+ * Si l'admin existe déjà, met à jour son mot de passe et son rôle.
+ */
+
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
 
-// Définir le modèle User directement dans ce script
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    minlength: 3
-  },
-  firstName: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  phone: {
-    type: String,
-    trim: true
-  },
-  role: {
-    type: String,
-    enum: ['user', 'admin', 'moderator'],
-    default: 'user'
-  },
-  newsletter: {
-    type: Boolean,
-    default: false
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
+// ─── Connexion MongoDB ───
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/roots-radio';
 
-const User = mongoose.model('User', userSchema);
+// ─── Schéma User minimal (identique à ton modèle) ───
+// On l'importe directement si possible, sinon on le redéfinit
+let User;
+try {
+  const { User: UserModel } = require('../models');
+  User = UserModel;
+} catch (e) {
+  // Fallback : définir le modèle ici si l'import échoue
+  const UserSchema = new mongoose.Schema({
+    username:    { type: String, required: true, unique: true },
+    firstName:   { type: String, required: true },
+    lastName:    { type: String, required: true },
+    email:       { type: String, required: true, unique: true, lowercase: true },
+    password:    { type: String, required: true },
+    role:        { type: String, enum: ['user', 'admin'], default: 'user' },
+    isActive:    { type: Boolean, default: true },
+    phone:       { type: String, default: '' },
+    newsletter:  { type: Boolean, default: false },
+    lastLogin:   { type: Date }
+  }, { timestamps: true });
 
-const createAdmin = async () => {
+  User = mongoose.models.User || mongoose.model('User', UserSchema);
+}
+
+// ─── Données admin par défaut ───
+const ADMIN_DATA = {
+  email:     'roots@radio.com',
+  password:  'admin123',
+  firstName: 'Admin',
+  lastName:  'Roots',
+  username:  'admin',
+  role:      'admin',
+  isActive:  true
+};
+
+async function createAdmin() {
   try {
-    console.log('Connexion à MongoDB...');
-    console.log('URI de connexion:', process.env.MONGO_URI || 'mongodb://localhost:27017/radio');
-    
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/radio');
-    console.log('Connexion réussie à MongoDB');
-
-    // Supprimer l'admin existant s'il y en a un
-    await User.deleteOne({ email: 'admin@radio.com' });
-    console.log('Ancien admin supprimé (s\'il existait)');
+    console.log('🔌 Connexion à MongoDB...');
+    await mongoose.connect(MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('✅ Connecté à MongoDB');
 
     // Hash du mot de passe
     const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash('password123', salt);
-    console.log('Mot de passe hashé:', hashedPassword.substring(0, 20) + '...');
+    const hashedPassword = await bcrypt.hash(ADMIN_DATA.password, salt);
 
-    // Créer l'admin
-    const admin = new User({
-      username: 'admin',
-      firstName: 'Admin',
-      lastName: 'System',
-      email: 'admin@radio.com',
-      password: hashedPassword,
-      role: 'admin',
-      newsletter: false,
-      phone: '+237123456789'
-    });
+    // Chercher si l'admin existe déjà
+    const existing = await User.findOne({ email: ADMIN_DATA.email });
 
-    const savedAdmin = await admin.save();
-    console.log('Admin créé avec succès!');
-    console.log('ID:', savedAdmin._id);
-    console.log('Username:', savedAdmin.username);
-    console.log('Email:', savedAdmin.email);
-    console.log('Role:', savedAdmin.role);
+    if (existing) {
+      // Mettre à jour mot de passe + rôle si l'user existe
+      existing.password = hashedPassword;
+      existing.role     = 'admin';
+      existing.isActive = true;
+      await existing.save();
 
-    // Créer un utilisateur demo aussi
-    await User.deleteOne({ email: 'user@radio.com' });
-    
-    const demoUserPassword = await bcrypt.hash('password123', salt);
-    const demoUser = new User({
-      username: 'demouser',
-      firstName: 'Demo',
-      lastName: 'User',
-      email: 'user@radio.com',
-      password: demoUserPassword,
-      role: 'user',
-      newsletter: true,
-      phone: '+237987654321'
-    });
+      console.log('');
+      console.log('🔄 Admin mis à jour :');
+      console.log(`   Email    : ${ADMIN_DATA.email}`);
+      console.log(`   Password : ${ADMIN_DATA.password}`);
+      console.log(`   Rôle     : admin`);
+      console.log('');
+    } else {
+      // Vérifier si le username "admin" est déjà pris
+      let username = ADMIN_DATA.username;
+      const usernameExists = await User.findOne({ username });
+      if (usernameExists) {
+        username = 'adminroots';
+      }
 
-    const savedUser = await demoUser.save();
-    console.log('Utilisateur demo créé avec succès!');
-    console.log('Email:', savedUser.email);
+      // Créer l'admin
+      const admin = new User({
+        username,
+        firstName:  ADMIN_DATA.firstName,
+        lastName:   ADMIN_DATA.lastName,
+        email:      ADMIN_DATA.email,
+        password:   hashedPassword,
+        role:       'admin',
+        isActive:   true,
+        phone:      '',
+        newsletter: false
+      });
 
-    // Vérification finale
-    const allUsers = await User.find().select('username email role');
-    console.log('\nTous les utilisateurs en base:');
-    allUsers.forEach(user => {
-      console.log(`- ${user.username} (${user.email}) - Role: ${user.role}`);
-    });
+      await admin.save();
+
+      console.log('');
+      console.log('✅ Admin créé avec succès !');
+      console.log(`   Email    : ${ADMIN_DATA.email}`);
+      console.log(`   Password : ${ADMIN_DATA.password}`);
+      console.log(`   Username : ${username}`);
+      console.log(`   Rôle     : admin`);
+      console.log('');
+    }
+
+    console.log('🎯 Tu peux maintenant te connecter sur /login avec ces identifiants.');
+    console.log('');
 
   } catch (error) {
-    console.error('Erreur lors de la création:', error);
+    console.error('❌ Erreur :', error.message);
+    if (error.code === 11000) {
+      console.error('   Un utilisateur avec cet email ou username existe déjà.');
+    }
+    process.exit(1);
   } finally {
     await mongoose.disconnect();
-    console.log('Déconnexion de MongoDB');
+    console.log('🔌 Déconnecté de MongoDB');
   }
-};
+}
 
 createAdmin();

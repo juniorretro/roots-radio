@@ -38,7 +38,7 @@ const testConnection = async () => {
     });
 
     // Compter les utilisateurs
-    const User = require('../models/user');
+    const User = require('../models/User');
     const userCount = await User.countDocuments();
     console.log(`👤 Nombre d'utilisateurs: ${userCount}`);
 
