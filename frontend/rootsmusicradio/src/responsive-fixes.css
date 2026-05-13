@@ -1,0 +1,318 @@
+/* =============================================
+   ROOTS RADIO - RESPONSIVE FIXES
+   Ajouter dans App.css ou un fichier séparé
+   ============================================= */
+
+/* ---- PLAYER FIXE EN BAS ---- */
+.fixed-bottom-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(20px);
+  z-index: 1000;
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
+  padding: 8px 16px;
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+  .fixed-bottom-player {
+    height: 80px;
+    padding: 0 24px;
+  }
+  .player-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+  .player-program-info { display: flex; align-items: center; gap: 12px; }
+  .player-controls { flex: 1; display: flex; justify-content: center; }
+  .player-extras { display: flex; align-items: center; gap: 8px; }
+}
+
+/* Mobile */
+@media (max-width: 991px) {
+  .fixed-bottom-player {
+    height: auto;
+    padding: 8px 12px;
+  }
+  .player-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .player-program-info { display: none; } /* Masqué sur mobile */
+  .player-controls { width: 100%; }
+  .player-extras { display: none; } /* Masqué sur mobile */
+
+  /* Compensation pour le player en bas */
+  body {
+    padding-bottom: 80px;
+  }
+}
+
+/* ---- HERO SECTION HOME ---- */
+.home-hero {
+  padding: 40px 0 60px;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .home-hero {
+    padding: 20px 0 40px;
+  }
+}
+
+/* Vidéo hero responsive */
+.hero-video {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .hero-video {
+    height: 200px;
+    margin-top: 0 !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hero-video {
+    height: 320px;
+    margin-top: -5% !important;
+  }
+}
+
+/* ---- TITRES RESPONSIFS ---- */
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+@media (min-width: 1200px) { .page-title { font-size: 4rem; } }
+@media (min-width: 768px) and (max-width: 1199px) { .page-title { font-size: 3rem; } }
+@media (max-width: 767px) { .page-title { font-size: 2.2rem; } }
+
+/* ---- CAROUSEL HOME ---- */
+.dj-carousel-card {
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 991px) {
+  .dj-carousel-card {
+    min-height: 350px !important;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 575px) {
+  .dj-carousel-card {
+    min-height: 250px !important;
+  }
+}
+
+/* ---- HISTORIQUE ---- */
+.history-panel {
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+}
+
+@media (max-width: 991px) {
+  .history-panel {
+    margin-top: 24px;
+    border-radius: 16px;
+    padding: 16px;
+  }
+}
+
+/* ---- STATS SECTION ---- */
+.stats-section {
+  padding: 60px 0;
+  background: #fff;
+}
+
+@media (max-width: 767px) {
+  .stats-section {
+    padding: 40px 0;
+  }
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 300;
+  font-family: 'Cormorant Garamond', serif;
+  color: #000;
+}
+
+@media (max-width: 575px) {
+  .stat-number { font-size: 2.2rem; }
+}
+
+/* ---- FEATURED PROGRAMS ---- */
+.featured-programs-section {
+  padding: 60px 0;
+  background: #fafafa;
+}
+
+@media (max-width: 767px) {
+  .featured-programs-section { padding: 40px 0; }
+}
+
+/* ---- CTA SECTION ---- */
+.cta-section {
+  padding: 80px 0;
+  background: #000;
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .cta-section { padding: 50px 0; }
+}
+
+.cta-title {
+  font-size: 3.5rem;
+  font-weight: 300;
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 991px) { .cta-title { font-size: 2.5rem; } }
+@media (max-width: 575px) { .cta-title { font-size: 1.8rem; } }
+
+/* ---- NAVBAR LOGO FIX ---- */
+.navbar-brand-logo {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 575px) {
+  .navbar-brand-logo img {
+    width: 80px !important;
+  }
+}
+
+/* ---- EMISSIONS PAGE ---- */
+.emissions-header h1 {
+  font-size: 4rem;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+@media (max-width: 991px) { .emissions-header h1 { font-size: 3rem; } }
+@media (max-width: 575px) { .emissions-header h1 { font-size: 2rem; } }
+
+.host-card-image {
+  height: 350px;
+}
+
+@media (max-width: 575px) {
+  .host-card-image { height: 260px; }
+}
+
+/* ---- PROGRAMS PAGE ---- */
+.programs-header h1 {
+  font-size: 4rem;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+@media (max-width: 991px) { .programs-header h1 { font-size: 2.8rem; } }
+@media (max-width: 575px) { .programs-header h1 { font-size: 2rem; } }
+
+/* Filtres scroll horizontal sur mobile */
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 575px) {
+  .filter-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  .filter-pills::-webkit-scrollbar { display: none; }
+  .filter-pills .btn, .filter-pills .nav-link {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+/* ---- ADMIN SIDEBAR RESPONSIVE ---- */
+@media (max-width: 767px) {
+  .admin-sidebar {
+    min-height: auto !important;
+  }
+}
+
+/* ---- ARTISTS CAROUSEL RESPONSIVE ---- */
+.carousel-main-title {
+  font-size: clamp(2.5rem, 8vw, 6rem) !important;
+}
+
+.carousel-subtitle {
+  font-size: clamp(1rem, 3vw, 2rem) !important;
+}
+
+/* ---- AUDIO PLAYER CARD ---- */
+@media (max-width: 575px) {
+  .audio-player-card .d-flex {
+    flex-wrap: wrap;
+  }
+  .audio-player-card img {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  .volume-control input[type="range"] {
+    width: 60px !important;
+  }
+}
+
+/* ---- SPLASH SCREEN RESPONSIVE ---- */
+@media (max-width: 575px) {
+  .splash-title { font-size: 2.5rem !important; }
+  .splash-subtitle { font-size: 14px !important; }
+  .splash-logo { width: 120px !important; height: 120px !important; }
+  .splash-loader { width: 200px !important; }
+}
+
+/* ---- FOOTER RESPONSIVE ---- */
+@media (max-width: 767px) {
+  .footer-soft {
+    text-align: center;
+  }
+  .footer-soft .contact-info {
+    justify-content: center;
+  }
+}
+
+/* ---- MODAL EPISODES (Emissions) ---- */
+@media (max-width: 575px) {
+  .modal-body .d-flex.align-items-center {
+    flex-direction: column;
+    text-align: center;
+  }
+  .modal-body img {
+    width: 100% !important;
+    height: 160px;
+    object-fit: cover;
+    margin-right: 0 !important;
+    margin-bottom: 12px;
+  }
+}

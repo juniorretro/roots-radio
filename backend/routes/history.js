@@ -1,6 +1,6 @@
 // const express = require('express');
 // const router = express.Router();
-// const PlayHistory = require('../models/playHistory');
+// const PlayHistory = require('../models/PlayHistory');
 
 // /**
 //  * @route   GET /api/history
@@ -184,7 +184,7 @@
 
 const express = require('express');
 const router = express.Router();
-const PlayHistory = require('../models/playHistory');
+const PlayHistory = require('../models/PlayHistory');
 const { adminAuth } = require('../middleware/auth');
 
 /**

@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { User, Program, Episode, Podcast, PlayHistory, Emission } = require('../models');
+const { User, Program, Episode, Podcast, Emission } = require('../models');
+const PlayHistory = require('../models/PlayHistory');
+const { adminAuth } = require('../middleware/auth');
 
 // ✅ GET /api/stats - Récupérer toutes les statistiques du site
-router.get('/', async (req, res) => {
+router.get('/', adminAuth, async (req, res) => {
   try {
     // Récupérer les statistiques en parallèle pour plus de performance
     const [

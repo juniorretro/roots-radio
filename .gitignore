@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment variables - NE JAMAIS COMMITTER
+.env
+.env.local
+.env.production
+backend/.env
+
+# Build
+build/
+dist/
+frontend/rootsmusicradio/build/
+
+# Archives inutiles
+back.zip
+front.zip
+back/
+front/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads locaux
+backend/uploads/*
+!backend/uploads/.gitkeep

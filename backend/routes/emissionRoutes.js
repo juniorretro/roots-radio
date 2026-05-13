@@ -231,6 +231,246 @@
 
 // module.exports = router;
 
+// const express = require('express');
+// const router = express.Router();
+// const { body, validationResult } = require('express-validator');
+// const Emission = require('../models/Emission');
+// const { Program } = require('../models');
+// const { adminAuth } = require('../middleware/auth');
+
+// // ✅ GET /api/emissions - Récupérer toutes les émissions avec leurs hôtes
+// router.get('/', async (req, res) => {
+//   try {
+//     const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+//     const page = Math.max(parseInt(req.query.page) || 1, 1);
+
+//     const emissions = await Emission.find()
+//       .populate('programId', 'title slug image')
+//       .sort({ airedAt: -1 })
+//       .limit(limit)
+//       .skip((page - 1) * limit)
+//       .lean();
+
+//     const hostsMap = new Map();
+
+//     emissions.forEach(emission => {
+//       const hostKey = emission.host || 'Inconnu';
+
+//       if (!hostsMap.has(hostKey)) {
+//         hostsMap.set(hostKey, {
+//           id: emission._id,
+//           name: emission.host,
+//           photo: emission.cover || '/images/hosts/placeholder.jpg',
+//           bio: emission.bio || emission.description || '',
+//           program: emission.programId?.title || emission.category || 'Émission',
+//           title: emission.category || 'Animateur',
+//           schedule: emission.schedule || '',
+//           episodes: []
+//         });
+//       }
+
+//       hostsMap.get(hostKey).episodes.push({
+//         id: emission._id.toString(),
+//         title: emission.title,
+//         date: emission.airedAt,
+//         duration: emission.duration
+//           ? `${Math.floor(emission.duration / 60)}:${(emission.duration % 60).toString().padStart(2, '0')}`
+//           : '00:00:00',
+//         audioUrl: emission.audioUrl || '/audio/emissions/default.mp3',
+//         cover: emission.cover || '/images/default-cover.jpg',
+//         description: emission.description || 'Aucune description'
+//       });
+//     });
+
+//     const hosts = Array.from(hostsMap.values());
+//     const total = await Emission.countDocuments();
+
+//     res.json({
+//       hosts,
+//       emissions,
+//       pagination: {
+//         total,
+//         totalPages: Math.ceil(total / limit),
+//         currentPage: page,
+//         limit
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Error fetching emissions:', error);
+//     res.status(500).json({
+//       error: 'Erreur serveur',
+//       message: 'Erreur lors de la récupération des émissions'
+//     });
+//   }
+// });
+
+// // ✅ GET /api/emissions/recent/:limit - Récupérer les émissions récentes
+// router.get('/recent/:limit', async (req, res) => {
+//   try {
+//     const limit = Math.min(parseInt(req.params.limit) || 10, 50);
+//     const emissions = await Emission.getRecentHistory(limit);
+//     res.json({ emissions });
+//   } catch (error) {
+//     console.error('Error fetching recent emissions:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// // ✅ GET /api/emissions/today - Récupérer les émissions d'aujourd'hui
+// router.get('/today', async (req, res) => {
+//   try {
+//     const emissions = await Emission.getTodayHistory();
+//     res.json({ emissions });
+//   } catch (error) {
+//     console.error('Error fetching today emissions:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// // ✅ GET /api/emissions/host/:host - Récupérer les émissions par animateur
+// router.get('/host/:host', async (req, res) => {
+//   try {
+//     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+
+//     const emissions = await Emission.find({ host: req.params.host })
+//       .populate('programId', 'title slug image')
+//       .sort({ airedAt: -1 })
+//       .limit(limit)
+//       .lean();
+
+//     res.json({ emissions });
+//   } catch (error) {
+//     console.error('Error fetching emissions by host:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// // ✅ GET /api/emissions/:id - Récupérer une émission spécifique
+// router.get('/:id', async (req, res) => {
+//   try {
+//     const emission = await Emission.findById(req.params.id)
+//       .populate('programId', 'title slug image description');
+
+//     if (!emission) {
+//       return res.status(404).json({ message: 'Émission non trouvée' });
+//     }
+
+//     res.json(emission);
+//   } catch (error) {
+//     console.error('Error fetching emission:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// // ✅ POST /api/emissions - Créer une nouvelle émission (Admin uniquement)
+// router.post('/', adminAuth, [
+//   body('title').trim().notEmpty().isLength({ max: 200 }).withMessage('Titre requis (max 200 caractères)'),
+//   body('host').trim().notEmpty().isLength({ max: 100 }).withMessage('Animateur requis (max 100 caractères)'),
+//   body('description').optional().trim().isLength({ max: 2000 }).withMessage('Description trop longue (max 2000 caractères)'),
+//   body('category').optional().trim().isLength({ max: 50 }),
+//   body('cover').optional().trim().matches(/^(\/|https?:\/\/)/).withMessage('URL de cover invalide'),
+//   body('audioUrl').optional().trim().matches(/^(\/|https?:\/\/)/).withMessage('URL audio invalide'),
+//   body('duration').optional().isInt({ min: 1, max: 86400 }).withMessage('Durée invalide (en secondes, max 24h)'),
+//   body('programId').optional().isMongoId().withMessage('ID de programme invalide')
+// ], async (req, res) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ message: 'Erreurs de validation', errors: errors.array() });
+//     }
+
+//     const {
+//       title, host, programId, description, cover,
+//       duration, category, audioUrl, bio, schedule, episodes
+//     } = req.body;
+
+//     const emission = new Emission({
+//       title,
+//       host,
+//       programId: programId || null,
+//       description: description || '',
+//       cover: cover || '/images/default-emission.png',
+//       duration: duration || null,
+//       category: category || 'Émission',
+//       audioUrl: audioUrl || '',
+//       bio: bio || '',
+//       schedule: schedule || '',
+//       episodes: episodes || []
+//     });
+
+//     await emission.save();
+
+//     res.status(201).json({
+//       message: 'Émission créée avec succès',
+//       emission
+//     });
+//   } catch (error) {
+//     console.error('Error creating emission:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// // ✅ PUT /api/emissions/:id - Mettre à jour une émission (Admin uniquement)
+// router.put('/:id', adminAuth, [
+//   body('title').optional().trim().notEmpty().isLength({ max: 200 }),
+//   body('host').optional().trim().notEmpty().isLength({ max: 100 }),
+//   body('description').optional().trim().isLength({ max: 2000 }),
+//   body('category').optional().trim().isLength({ max: 50 }),
+//   body('cover').optional().trim().matches(/^(\/|https?:\/\/)/),
+//   body('audioUrl').optional().trim().matches(/^(\/|https?:\/\/)/),
+//   body('duration').optional().isInt({ min: 1, max: 86400 }),
+//   body('programId').optional().isMongoId()
+// ], async (req, res) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ message: 'Erreurs de validation', errors: errors.array() });
+//     }
+
+//     const emission = await Emission.findById(req.params.id);
+
+//     if (!emission) {
+//       return res.status(404).json({ message: 'Émission non trouvée' });
+//     }
+
+//     // Liste blanche des champs modifiables
+//     const allowedFields = ['title', 'host', 'description', 'cover', 'duration', 'category', 'audioUrl', 'bio', 'schedule', 'programId'];
+//     allowedFields.forEach(key => {
+//       if (req.body[key] !== undefined) {
+//         emission[key] = req.body[key];
+//       }
+//     });
+
+//     await emission.save();
+
+//     res.json({
+//       message: 'Émission mise à jour avec succès',
+//       emission
+//     });
+//   } catch (error) {
+//     console.error('Error updating emission:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// // ✅ DELETE /api/emissions/:id - Supprimer une émission (Admin uniquement)
+// router.delete('/:id', adminAuth, async (req, res) => {
+//   try {
+//     const emission = await Emission.findByIdAndDelete(req.params.id);
+
+//     if (!emission) {
+//       return res.status(404).json({ message: 'Émission non trouvée' });
+//     }
+
+//     res.json({ message: 'Émission supprimée avec succès' });
+//   } catch (error) {
+//     console.error('Error deleting emission:', error);
+//     res.status(500).json({ error: 'Erreur serveur' });
+//   }
+// });
+
+// module.exports = router;
+
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
@@ -238,11 +478,11 @@ const Emission = require('../models/Emission');
 const { Program } = require('../models');
 const { adminAuth } = require('../middleware/auth');
 
-// ✅ GET /api/emissions - Récupérer toutes les émissions avec leurs hôtes
+// ✅ GET /api/emissions/
 router.get('/', async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 50, 100);
-    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const page  = Math.max(parseInt(req.query.page)  || 1, 1);
 
     const emissions = await Emission.find()
       .populate('programId', 'title slug image')
@@ -252,15 +492,13 @@ router.get('/', async (req, res) => {
       .lean();
 
     const hostsMap = new Map();
-
     emissions.forEach(emission => {
       const hostKey = emission.host || 'Inconnu';
-
       if (!hostsMap.has(hostKey)) {
         hostsMap.set(hostKey, {
           id: emission._id,
           name: emission.host,
-          photo: emission.cover || '/images/hosts/placeholder.jpg',
+          photo: emission.cover || '/images/default-cover.png',
           bio: emission.bio || emission.description || '',
           program: emission.programId?.title || emission.category || 'Émission',
           title: emission.category || 'Animateur',
@@ -268,93 +506,138 @@ router.get('/', async (req, res) => {
           episodes: []
         });
       }
-
       hostsMap.get(hostKey).episodes.push({
-        id: emission._id.toString(),
-        title: emission.title,
-        date: emission.airedAt,
-        duration: emission.duration
+        id:          emission._id.toString(),
+        title:       emission.title,
+        date:        emission.airedAt,
+        duration:    emission.duration
           ? `${Math.floor(emission.duration / 60)}:${(emission.duration % 60).toString().padStart(2, '0')}`
           : '00:00:00',
-        audioUrl: emission.audioUrl || '/audio/emissions/default.mp3',
-        cover: emission.cover || '/images/default-cover.jpg',
+        audioUrl:    emission.audioUrl || '',
+        cover:       emission.cover || '/images/default-cover.png',
         description: emission.description || 'Aucune description'
       });
     });
 
     const hosts = Array.from(hostsMap.values());
     const total = await Emission.countDocuments();
-
-    res.json({
-      hosts,
-      emissions,
-      pagination: {
-        total,
-        totalPages: Math.ceil(total / limit),
-        currentPage: page,
-        limit
-      }
-    });
+    res.json({ hosts, emissions, pagination: { total, totalPages: Math.ceil(total / limit), currentPage: page, limit } });
   } catch (error) {
     console.error('Error fetching emissions:', error);
-    res.status(500).json({
-      error: 'Erreur serveur',
-      message: 'Erreur lors de la récupération des émissions'
-    });
+    res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET /api/emissions/recent/:limit - Récupérer les émissions récentes
+// ✅ GET /api/emissions/recent/:limit
 router.get('/recent/:limit', async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.params.limit) || 10, 50);
     const emissions = await Emission.getRecentHistory(limit);
     res.json({ emissions });
   } catch (error) {
-    console.error('Error fetching recent emissions:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET /api/emissions/today - Récupérer les émissions d'aujourd'hui
+// ✅ GET /api/emissions/today
 router.get('/today', async (req, res) => {
   try {
     const emissions = await Emission.getTodayHistory();
     res.json({ emissions });
   } catch (error) {
-    console.error('Error fetching today emissions:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET /api/emissions/host/:host - Récupérer les émissions par animateur
+// ✅ GET /api/emissions/hosts — animateurs regroupés (pour AdminEmissions)
+// ⚠️ DOIT être avant /:id
+router.get('/hosts', async (req, res) => {
+  try {
+    const emissions = await Emission.find()
+      .populate('programId', 'title slug')
+      .sort({ airedAt: -1 })
+      .lean();
+
+    const hostsMap = new Map();
+    emissions.forEach(em => {
+      const key = em.host || 'Inconnu';
+      if (!hostsMap.has(key)) {
+        hostsMap.set(key, {
+          _id: key,
+          name: em.host || 'Inconnu',
+          photo: em.cover || '/images/default-cover.png',
+          bio: em.bio || '',
+          program: em.programId?.title || em.category || 'Émission',
+          schedule: em.schedule || '',
+          isActive: true,
+          episodes: []
+        });
+      }
+      hostsMap.get(key).episodes.push({
+        _id: em._id, id: em._id.toString(),
+        title: em.title, date: em.airedAt,
+        duration: em.duration ? `${Math.floor(em.duration/60)}:${(em.duration%60).toString().padStart(2,'0')}` : null,
+        audioUrl: em.audioUrl || '', cover: em.cover || '/images/default-cover.png',
+        description: em.description || '',
+      });
+    });
+
+    res.json({ hosts: Array.from(hostsMap.values()) });
+  } catch (error) {
+    console.error('Error fetching hosts:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ✅ GET /api/emissions/episodes — tous les épisodes (pour AdminEmissions)
+// ⚠️ DOIT être avant /:id
+router.get('/episodes', async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 100, 200);
+    const emissions = await Emission.find()
+      .populate('programId', 'title slug')
+      .sort({ airedAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const episodes = emissions.map(em => ({
+      _id: em._id, id: em._id.toString(),
+      title: em.title,
+      hostId: { _id: em.host, name: em.host },
+      date: em.airedAt,
+      duration: em.duration ? `${Math.floor(em.duration/60)}:${(em.duration%60).toString().padStart(2,'0')}` : null,
+      audioUrl: em.audioUrl || '', cover: em.cover || '/images/default-cover.png',
+      description: em.description || '',
+    }));
+
+    res.json({ episodes });
+  } catch (error) {
+    console.error('Error fetching episodes:', error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// ✅ GET /api/emissions/host/:host
 router.get('/host/:host', async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
-
     const emissions = await Emission.find({ host: req.params.host })
       .populate('programId', 'title slug image')
       .sort({ airedAt: -1 })
       .limit(limit)
       .lean();
-
     res.json({ emissions });
   } catch (error) {
-    console.error('Error fetching emissions by host:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ GET /api/emissions/:id - Récupérer une émission spécifique
+// ✅ GET /api/emissions/:id — EN DERNIER parmi les GET
 router.get('/:id', async (req, res) => {
   try {
     const emission = await Emission.findById(req.params.id)
       .populate('programId', 'title slug image description');
-
-    if (!emission) {
-      return res.status(404).json({ message: 'Émission non trouvée' });
-    }
-
+    if (!emission) return res.status(404).json({ message: 'Émission non trouvée' });
     res.json(emission);
   } catch (error) {
     console.error('Error fetching emission:', error);
@@ -362,106 +645,74 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ POST /api/emissions - Créer une nouvelle émission (Admin uniquement)
+// ✅ POST /api/emissions/
 router.post('/', adminAuth, [
-  body('title').trim().notEmpty().isLength({ max: 200 }).withMessage('Titre requis (max 200 caractères)'),
-  body('host').trim().notEmpty().isLength({ max: 100 }).withMessage('Animateur requis (max 100 caractères)'),
-  body('description').optional().trim().isLength({ max: 2000 }).withMessage('Description trop longue (max 2000 caractères)'),
+  body('title').trim().notEmpty().isLength({ max: 200 }),
+  body('host').trim().notEmpty().isLength({ max: 100 }),
+  body('description').optional().trim().isLength({ max: 2000 }),
   body('category').optional().trim().isLength({ max: 50 }),
-  body('cover').optional().trim().matches(/^(\/|https?:\/\/)/).withMessage('URL de cover invalide'),
-  body('audioUrl').optional().trim().matches(/^(\/|https?:\/\/)/).withMessage('URL audio invalide'),
-  body('duration').optional().isInt({ min: 1, max: 86400 }).withMessage('Durée invalide (en secondes, max 24h)'),
-  body('programId').optional().isMongoId().withMessage('ID de programme invalide')
+  body('cover').optional().trim(),
+  body('audioUrl').optional().trim(),
+  body('duration').optional().isInt({ min: 1, max: 86400 }),
+  body('programId').optional().isMongoId()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: 'Erreurs de validation', errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ message: 'Erreurs de validation', errors: errors.array() });
 
-    const {
-      title, host, programId, description, cover,
-      duration, category, audioUrl, bio, schedule, episodes
-    } = req.body;
-
+    const { title, host, programId, description, cover, duration, category, audioUrl, bio, schedule } = req.body;
     const emission = new Emission({
-      title,
-      host,
-      programId: programId || null,
+      title, host,
+      programId:   programId   || null,
       description: description || '',
-      cover: cover || '/images/default-emission.png',
-      duration: duration || null,
-      category: category || 'Émission',
-      audioUrl: audioUrl || '',
-      bio: bio || '',
-      schedule: schedule || '',
-      episodes: episodes || []
+      cover:       cover       || '/images/default-cover.png',
+      duration:    duration    || null,
+      category:    category    || 'Émission',
+      audioUrl:    audioUrl    || '',
+      bio:         bio         || '',
+      schedule:    schedule    || '',
     });
-
     await emission.save();
-
-    res.status(201).json({
-      message: 'Émission créée avec succès',
-      emission
-    });
+    res.status(201).json({ message: 'Émission créée avec succès', emission });
   } catch (error) {
     console.error('Error creating emission:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ PUT /api/emissions/:id - Mettre à jour une émission (Admin uniquement)
+// ✅ PUT /api/emissions/:id
 router.put('/:id', adminAuth, [
   body('title').optional().trim().notEmpty().isLength({ max: 200 }),
   body('host').optional().trim().notEmpty().isLength({ max: 100 }),
   body('description').optional().trim().isLength({ max: 2000 }),
   body('category').optional().trim().isLength({ max: 50 }),
-  body('cover').optional().trim().matches(/^(\/|https?:\/\/)/),
-  body('audioUrl').optional().trim().matches(/^(\/|https?:\/\/)/),
+  body('cover').optional().trim(),
+  body('audioUrl').optional().trim(),
   body('duration').optional().isInt({ min: 1, max: 86400 }),
   body('programId').optional().isMongoId()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: 'Erreurs de validation', errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ message: 'Erreurs de validation', errors: errors.array() });
 
     const emission = await Emission.findById(req.params.id);
+    if (!emission) return res.status(404).json({ message: 'Émission non trouvée' });
 
-    if (!emission) {
-      return res.status(404).json({ message: 'Émission non trouvée' });
-    }
-
-    // Liste blanche des champs modifiables
-    const allowedFields = ['title', 'host', 'description', 'cover', 'duration', 'category', 'audioUrl', 'bio', 'schedule', 'programId'];
-    allowedFields.forEach(key => {
-      if (req.body[key] !== undefined) {
-        emission[key] = req.body[key];
-      }
-    });
-
+    const allowed = ['title','host','description','cover','duration','category','audioUrl','bio','schedule','programId'];
+    allowed.forEach(key => { if (req.body[key] !== undefined) emission[key] = req.body[key]; });
     await emission.save();
-
-    res.json({
-      message: 'Émission mise à jour avec succès',
-      emission
-    });
+    res.json({ message: 'Émission mise à jour avec succès', emission });
   } catch (error) {
     console.error('Error updating emission:', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 
-// ✅ DELETE /api/emissions/:id - Supprimer une émission (Admin uniquement)
+// ✅ DELETE /api/emissions/:id
 router.delete('/:id', adminAuth, async (req, res) => {
   try {
     const emission = await Emission.findByIdAndDelete(req.params.id);
-
-    if (!emission) {
-      return res.status(404).json({ message: 'Émission non trouvée' });
-    }
-
+    if (!emission) return res.status(404).json({ message: 'Émission non trouvée' });
     res.json({ message: 'Émission supprimée avec succès' });
   } catch (error) {
     console.error('Error deleting emission:', error);
