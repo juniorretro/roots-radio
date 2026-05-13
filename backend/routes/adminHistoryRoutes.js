@@ -5,7 +5,7 @@ const {
   addToBlacklist,
   calculateMusicConfidenceScore 
 } = require('../services/adFilter');
-const PlayHistory = require('../models/playHistory');
+const PlayHistory = require('../models/PlayHistory');
 const { adminAuth } = require('../middleware/auth');
 
 

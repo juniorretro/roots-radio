@@ -46,6 +46,7 @@ const streamRoutes          = require('./routes/streamRoutes');
 const adminHistoryRoutes    = require('./routes/adminHistoryRoutes');
 const combinedHistoryRoutes = require('./routes/combinedHistoryRoutes');
 
+
 // ─────────────────────────────────────────────
 // App & Server
 // ─────────────────────────────────────────────
@@ -234,7 +235,7 @@ server.listen(PORT, () => {
 // 13. NETTOYAGE AUTOMATIQUE
 // ─────────────────────────────────────────────
 if (process.env.AUTO_CLEAN_HISTORY === 'true') {
-  const PlayHistory = require('./models/playHistory');
+  const PlayHistory = require('./models/PlayHistory');
   const Emission    = require('./models/Emission');
 
   setInterval(async () => {

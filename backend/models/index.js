@@ -3,8 +3,10 @@ const Program = require('./Program');
 const Episode = require('./Episode');
 const Podcast = require('./Podcast');
 const Emission = require('./Emission');
+const PlayHistory = require('./PlayHistory');
+const Affiche = require('./Affiche');
 
-module.exports = { User, Program, Episode, Podcast, Emission };
+module.exports = { User, Program, Episode, Podcast, Emission, PlayHistory, Affiche };
 
 // const mongoose = require('mongoose');
 //    const Emission = require('./Emission');

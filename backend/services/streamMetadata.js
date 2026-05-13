@@ -1,7 +1,7 @@
 
 const icy = require('icy');
 const { getCoverFromITunes } = require('./coverService');
-const PlayHistory = require('../models/playHistory');
+const PlayHistory = require('../models/PlayHistory');
 const { shouldAddToHistory } = require('./adFilter');
 
 let currentSong = {
@@ -18,27 +18,43 @@ let listenerCount = 0;
 // Cache de l'historique récent pour détection de doublons
 let recentHistoryCache = [];
 
+let reconnectAttempts = 0;
+const MAX_RECONNECT_DELAY = 30000; // 30s max
+let connectionHandlerSetup = false;
+
 const startStreamMetadata = (io) => {
   console.log('🎵 Starting stream metadata listener...');
   
-  // Charger l'historique récent au démarrage
-  loadRecentHistory();
-  
+  if (reconnectAttempts === 0) {
+    loadRecentHistory();
+  }
+
+  const reconnect = () => {
+    reconnectAttempts++;
+    const delay = Math.min(5000 * reconnectAttempts, MAX_RECONNECT_DELAY);
+    console.log(`🔄 Reconnecting in ${delay/1000}s (attempt ${reconnectAttempts})...`);
+    setTimeout(() => startStreamMetadata(io), delay);
+  };
+
   icy.get(process.env.LIVE_STREAM_URL, (res) => {
+    reconnectAttempts = 0; // reset on successful connection
     console.log('✅ Connected to stream:', process.env.LIVE_STREAM_URL);
+
+    // Consommer le buffer audio pour que les événements metadata continuent d'arriver
+    res.resume();
 
     res.on('metadata', async (metadata) => {
       const parsed = icy.parse(metadata);
 
-      if (!parsed.StreamTitle) {
-        console.log('⚠️ No StreamTitle in metadata');
-        return;
-      }
+      if (!parsed.StreamTitle) return;
 
       // Parser le format "Artist - Title"
       const parts = parsed.StreamTitle.split(' - ');
       const artist = parts[0]?.trim() || '';
       const title = parts[1]?.trim() || parts[0];
+
+      // Ignorer si c'est le même morceau valide déjà en cours
+      if (currentSong.title === title && currentSong.artist === artist && !currentSong.isAd) return;
 
       console.log('🎵 New track detected:', artist, '-', title);
 
@@ -88,16 +104,6 @@ const startStreamMetadata = (io) => {
       }
 
       console.log(`✅ Track validated (score: ${filterResult.score}/100)`);
-
-      // 🔁 Évite les appels inutiles si c'est le même morceau
-      if (
-        currentSong.title === title &&
-        currentSong.artist === artist &&
-        !currentSong.isAd
-      ) {
-        console.log('⏭️ Same track, skipping:', title);
-        return;
-      }
 
       // Mettre à jour le morceau en cours
       currentSong = {
@@ -150,26 +156,21 @@ const startStreamMetadata = (io) => {
 
     res.on('end', () => {
       console.log('⚠️ Stream ended, reconnecting...');
-      // Reconnexion automatique après 5 secondes
-      setTimeout(() => startStreamMetadata(io), 5000);
+      reconnect();
     });
   }).on('error', (error) => {
-    console.error('❌ Connection error:', error);
-    // Reconnexion automatique après 5 secondes
-    setTimeout(() => startStreamMetadata(io), 5000);
+    console.error('❌ Connection error:', error.message);
+    reconnect();
   });
 
-  // Gérer le compteur d'auditeurs
-  if (io) {
+  // Gérer le compteur d'auditeurs (une seule fois, pas à chaque reconnexion)
+  if (io && !connectionHandlerSetup) {
+    connectionHandlerSetup = true;
     io.on('connection', (socket) => {
       listenerCount++;
       console.log(`👤 Listener connected. Total: ${listenerCount}`);
-      
-      // Envoyer immédiatement le morceau en cours
-      socket.emit('nowPlaying', {
-        ...currentSong,
-        listeners: listenerCount
-      });
+
+      socket.emit('nowPlaying', { ...currentSong, listeners: listenerCount });
 
       socket.on('disconnect', () => {
         listenerCount--;

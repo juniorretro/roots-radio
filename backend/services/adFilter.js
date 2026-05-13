@@ -130,7 +130,7 @@ const isTooGeneric = (title) => {
 /**
  * Détection de doublons récents (même artiste/titre dans les X dernières secondes)
  */
-const isDuplicateRecent = async (title, artist, recentHistory, maxAgeSeconds = 300) => {
+const isDuplicateRecent = (title, artist, recentHistory, maxAgeSeconds = 300) => {
   if (!recentHistory || recentHistory.length === 0) return false;
   
   const now = new Date();
