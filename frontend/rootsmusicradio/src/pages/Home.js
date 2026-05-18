@@ -210,7 +210,8 @@ const Home = () => {
 
       {/* ─── HERO VIDEO ─── */}
       <section style={{ background: '#fff' }}>
-        <video style={{ width: '100%', objectFit: 'cover', display: 'block', maxHeight: 360 }} autoPlay muted loop playsInline>
+        <video style={{ width: '100%', objectFit: 'cover', display: 'block', maxHeight: 360 }} autoPlay muted loop playsInline
+          onError={e => { e.currentTarget.style.display = 'none'; }}>
           <source src="/logo.mp4" type="video/mp4" />
         </video>
 
