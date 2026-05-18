@@ -11,9 +11,10 @@ node_modules/
 build/
 dist/
 
-# large media files (hosted externally)
+# large media files (hosted externally — exceed Cloudflare 25MB limit)
 public/logo.mp4
 public/*.mp4
+public/audio/
 
 # logs
 npm-debug.log*
