@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect, useRef } from 'r
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import { notifyNowPlaying } from '../services/pushNotifications';
 
 const RadioContext = createContext();
 
@@ -137,6 +138,7 @@ export const RadioProvider = ({ children }) => {
         listeners: data.listeners || 0,
       };
       setNowPlaying(newTrack);
+      notifyNowPlaying(newTrack);
       setPlayHistory(prev => {
         const dup = prev[0]?.title === newTrack.title && prev[0]?.artist === newTrack.artist;
         if (dup) return prev;

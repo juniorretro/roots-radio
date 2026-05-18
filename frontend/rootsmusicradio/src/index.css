@@ -1,3 +1,64 @@
+:root {
+  --rr-bg:          #fafafa;
+  --rr-bg2:         #ffffff;
+  --rr-surface:     #ffffff;
+  --rr-border:      rgba(0,0,0,0.08);
+  --rr-text:        #1a1a1a;
+  --rr-text2:       #666666;
+  --rr-text3:       #999999;
+  --rr-player-bg:   rgba(255,255,255,0.97);
+  --rr-nav-bg:      rgba(255,255,255,0.95);
+  --rr-card-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] {
+  --rr-bg:          #0a0a0a;
+  --rr-bg2:         #111111;
+  --rr-surface:     #1a1a1a;
+  --rr-border:      rgba(255,255,255,0.08);
+  --rr-text:        #f0f0f0;
+  --rr-text2:       #aaaaaa;
+  --rr-text3:       #666666;
+  --rr-player-bg:   rgba(18,18,18,0.97);
+  --rr-nav-bg:      rgba(15,15,15,0.95);
+  --rr-card-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] .App {
+  background: var(--rr-bg);
+  color: var(--rr-text);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .modal-content {
+  background-color: var(--rr-surface) !important;
+  border-color: var(--rr-border) !important;
+  color: var(--rr-text) !important;
+}
+
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-footer {
+  background-color: var(--rr-surface) !important;
+  color: var(--rr-text) !important;
+}
+
+[data-theme="dark"] .navbar-light .navbar-brand,
+[data-theme="dark"] .navbar-light .nav-link {
+  color: var(--rr-text) !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--rr-text2) !important;
+}
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light {
+  background-color: var(--rr-surface) !important;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,6 +66,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--rr-bg);
+  color: var(--rr-text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 code {

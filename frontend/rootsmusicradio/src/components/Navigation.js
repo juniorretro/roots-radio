@@ -4,11 +4,22 @@ import { Navbar, Nav, NavDropdown, Button, Container } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import SearchModal from './SearchModal';
 
 const Navigation = () => {
   const { t, i18n } = useTranslation();
   const { user, logout, isAdmin } = useAuth();
-  const [expanded, setExpanded] = useState(false);
+  const { dark, toggleTheme } = useTheme();
+  const [expanded, setExpanded]   = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Keyboard shortcut Ctrl+K / Cmd+K
+  React.useEffect(() => {
+    const handler = (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); setSearchOpen(true); } };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -21,6 +32,7 @@ const Navigation = () => {
 
   return (
     <>
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@400;500;600&display=swap');
@@ -255,6 +267,12 @@ const Navigation = () => {
                 </Nav.Link>
               </LinkContainer> */}
               
+              <LinkContainer to="/favorites">
+                <Nav.Link onClick={() => setExpanded(false)}>
+                  <i className="bi bi-heart me-1" />Favoris
+                </Nav.Link>
+              </LinkContainer>
+
               <LinkContainer to="/about">
                 <Nav.Link onClick={() => setExpanded(false)}>
                   {t('about')}
@@ -287,6 +305,25 @@ const Navigation = () => {
                 </NavDropdown.Item>
               </NavDropdown>
               
+              {/* Search button */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                title="Rechercher (Ctrl+K)"
+                style={{ background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 20, padding: '7px 14px', cursor: 'pointer', fontSize: 14, color: dark ? '#f0f0f0' : '#000', marginRight: 4, display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <i className="bi bi-search" />
+                <span className="d-none d-lg-inline" style={{ fontSize: 13, fontWeight: 500 }}>Rechercher</span>
+              </button>
+
+              {/* Dark mode toggle */}
+              <button
+                onClick={toggleTheme}
+                title={dark ? 'Mode clair' : 'Mode sombre'}
+                style={{ background: 'none', border: '1.5px solid rgba(0,0,0,0.15)', borderRadius: 20, padding: '7px 14px', cursor: 'pointer', fontSize: 15, color: dark ? '#f0f0f0' : '#000', marginRight: 8, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <i className={`bi bi-${dark ? 'sun' : 'moon'}`} />
+              </button>
+
               {user ? (
                 <NavDropdown 
                   title={
@@ -297,18 +334,26 @@ const Navigation = () => {
                   } 
                   id="user-dropdown"
                 >
+                  <LinkContainer to="/profile">
+                    <NavDropdown.Item onClick={() => setExpanded(false)}>
+                      <i className="bi bi-person me-2"></i>
+                      Mon profil
+                    </NavDropdown.Item>
+                  </LinkContainer>
+
                   {isAdmin() && (
                     <>
+                      <NavDropdown.Divider />
                       <LinkContainer to="/admin">
                         <NavDropdown.Item onClick={() => setExpanded(false)}>
                           <i className="bi bi-gear me-2"></i>
                           {t('admin')}
                         </NavDropdown.Item>
                       </LinkContainer>
-                      <NavDropdown.Divider />
                     </>
                   )}
-                  
+
+                  <NavDropdown.Divider />
                   <NavDropdown.Item onClick={handleLogout}>
                     <i className="bi bi-box-arrow-right me-2"></i>
                     {t('logout')}

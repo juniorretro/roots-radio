@@ -3,8 +3,8 @@ import { Container, Row, Col, Card, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRadio } from '../contexts/RadioContext';
-import AudioPlayer from '../components/AudioPlayer';
 import ArtistsCarousel from '../components/Artistscarousel';
+import FavoriteBtn from '../components/FavoriteBtn';
 import api from '../services/api';
 
 const Home = () => {
@@ -141,7 +141,7 @@ const Home = () => {
   );
 
   return (
-    <div style={{ background: '#fafafa', minHeight: '100vh', paddingBottom: 100 }}>
+    <div style={{ background: '#fafafa', minHeight: '100vh' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap');
         .history-container::-webkit-scrollbar{width:4px}
@@ -152,33 +152,6 @@ const Home = () => {
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
         .affiche-thumb{transition:all 0.3s ease;cursor:pointer}
       `}</style>
-
-      {/* ─── PLAYER FIXE EN BAS ─── */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(0,0,0,0.06)', backdropFilter: 'blur(20px)', zIndex: 1000, boxShadow: '0 -2px 20px rgba(0,0,0,0.04)' }}>
-        <div className="d-none d-lg-flex align-items-center justify-content-between px-4" style={{ height: 80 }}>
-          <div className="d-flex align-items-center" style={{ minWidth: 200 }}>
-            <span style={{ background: '#000', color: '#fff', fontSize: 10, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 600, padding: '4px 12px', borderRadius: 20, marginRight: 16, whiteSpace: 'nowrap', animation: 'blink 2s infinite' }}>● EN DIRECT</span>
-            {currentProgram && (
-              <div className="d-flex align-items-center">
-                <img src={currentProgram.image || '/uploads/placeholder-program.jpg'} alt={currentProgram.title} className="me-2" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 8 }} />
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#000' }}>{currentProgram.title}</div>
-                  <small style={{ color: '#666', fontSize: 12 }}>{currentProgram.host}</small>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="d-flex align-items-center justify-content-center flex-grow-1 mx-4"><AudioPlayer /></div>
-          <div style={{ minWidth: 80 }} />
-        </div>
-        <div className="d-lg-none px-3 py-2">
-          <div className="d-flex align-items-center gap-2 mb-1">
-            <span style={{ background: '#000', color: '#fff', fontSize: 9, letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 600, padding: '3px 8px', borderRadius: 20, whiteSpace: 'nowrap', flexShrink: 0 }}>● LIVE</span>
-            {nowPlaying?.title && <span style={{ fontSize: 12, fontWeight: 500, color: '#000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{nowPlaying.title}{nowPlaying.artist && <span style={{ color: '#666' }}> — {nowPlaying.artist}</span>}</span>}
-          </div>
-          <AudioPlayer />
-        </div>
-      </div>
 
       {/* ─── SECTION AFFICHES / ÉVÉNEMENTS ─── */}
       {affiches.length > 0 && (
@@ -307,7 +280,10 @@ const Home = () => {
                       <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, flexGrow: 1 }}>{program.description}</p>
                       <div className="d-flex justify-content-between align-items-center mt-3">
                         <Badge style={{ background: 'rgba(0,0,0,0.06)', color: '#000', padding: '6px 12px', borderRadius: 20 }}>{program.category}</Badge>
-                        <Link to={`/programs/${program.slug}`} className="btn btn-sm" style={{ background: '#000', color: '#fff', border: 'none', borderRadius: 20, padding: '6px 18px', fontSize: 12, fontWeight: 500 }}>Découvrir</Link>
+                        <div className="d-flex align-items-center gap-2">
+                          <FavoriteBtn item={{ id: program._id, type: 'program', title: program.title, subtitle: program.host, image: program.image, slug: program.slug }} size="sm" />
+                          <Link to={`/programs/${program.slug}`} className="btn btn-sm" style={{ background: '#000', color: '#fff', border: 'none', borderRadius: 20, padding: '6px 18px', fontSize: 12, fontWeight: 500 }}>Découvrir</Link>
+                        </div>
                       </div>
                     </Card.Body>
                   </Card>
@@ -341,7 +317,7 @@ const Home = () => {
       <section style={{ padding: 'clamp(40px, 6vw, 80px) 0', background: '#fff' }}>
         <Container>
           <Row className="g-4 text-center">
-            {[{ value: '24/7', label: 'Diffusion continue' }, { value: '50k+', label: 'Auditeurs actifs' }, { value: '1000+', label: 'Épisodes' }, { value: `${playHistory.length}+`, label: 'Titres joués' }].map((stat, i) => (
+            {[{ value: '24/7', label: 'Diffusion continue' }, { value: nowPlaying?.listeners > 0 ? nowPlaying.listeners.toLocaleString() : '—', label: 'Auditeurs en direct' }, { value: '1000+', label: 'Épisodes' }, { value: `${playHistory.length}+`, label: 'Titres joués' }].map((stat, i) => (
               <Col xs={6} md={3} key={i}>
                 <h3 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 300, color: '#000', fontFamily: 'Cormorant Garamond, serif', marginBottom: 8 }}>{stat.value}</h3>
                 <p style={{ color: '#666', fontSize: 12, letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: 500 }}>{stat.label}</p>

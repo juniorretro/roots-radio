@@ -230,12 +230,18 @@ import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import SplashScreen from './components/Splashscreen';
+import MiniPlayer from './components/MiniPlayer';
+import LiveChat from './components/LiveChat';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { FavoritesProvider } from './contexts/FavoritesContext';
 
 // Pages
 import Home from './pages/Home';
 import Programs from './pages/Programs';
 import ProgramDetail from './pages/ProgramDetail';
 import Episodes from './pages/Episodes';
+import Favorites from './pages/Favorites';
+import Profile from './pages/Profile';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
@@ -249,6 +255,7 @@ import AdminEpisodes from './pages/admin/AdminEpisodes';
 import AdminStats from './pages/admin/AdminStats';
 import AdminCombinedHistory from './pages/admin/AdminCombinedHistory';
 import AdminEmissions from './pages/admin/AdminEmissions';
+import AdminSongRequests from './pages/admin/AdminSongRequests';
 
 
 
@@ -283,13 +290,15 @@ function App() {
 
   // ✅ Afficher le site principal après le splash
   return (
+    <ThemeProvider>
+    <FavoritesProvider>
     <AuthProvider>
       <RadioProvider>
         <Router>
           <div className="App d-flex flex-column min-vh-100">
             <Navigation />
             
-            <main className="flex-grow-1">
+            <main className="flex-grow-1" style={{ paddingBottom: 80 }}>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
@@ -302,6 +311,8 @@ function App() {
                 <Route path="/programs/:slug" element={<ProgramDetail />} />
                 <Route path="/emissions" element={<Emissions />} />
                 <Route path="/episodes" element={<Episodes />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
@@ -328,11 +339,17 @@ function App() {
                     <AdminStats />
                   </ProtectedRoute>
                 } />
+                <Route path="/admin/song-requests" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <AdminSongRequests />
+                  </ProtectedRoute>
+                } />
               </Routes>
             </main>
             
             <Footer />
-            
+            <MiniPlayer />
+            <LiveChat />
             <ToastContainer
               position="top-right"
               autoClose={5000}
@@ -349,6 +366,8 @@ function App() {
         </Router>
       </RadioProvider>
     </AuthProvider>
+    </FavoritesProvider>
+    </ThemeProvider>
   );
 }
 

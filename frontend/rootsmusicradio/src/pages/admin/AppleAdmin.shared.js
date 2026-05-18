@@ -36,9 +36,10 @@ export const NAV_ITEMS = [
   { to:'/admin/programs',     icon:'calendar3',       label:'Programmes'      },
   { to:'/admin/episodes',     icon:'collection-play', label:'Épisodes'        },
   { to:'/admin/emissions',    icon:'broadcast',       label:'Émissions'       },
-  { to:'/admin/affiches',     icon:'images',          label:'Affiches'        },
-  { to:'/admin/history',      icon:'clock-history',   label:'Historique'      },
-  { to:'/admin/stats',        icon:'bar-chart',       label:'Statistiques'    },
+  { to:'/admin/affiches',      icon:'images',           label:'Affiches'         },
+  { to:'/admin/song-requests', icon:'music-note-beamed',label:'Demandes'        },
+  { to:'/admin/history',       icon:'clock-history',   label:'Historique'       },
+  { to:'/admin/stats',         icon:'bar-chart',       label:'Statistiques'     },
 ];
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────

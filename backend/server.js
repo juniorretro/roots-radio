@@ -45,6 +45,7 @@ const historyRoutes         = require('./routes/history');
 const streamRoutes          = require('./routes/streamRoutes');
 const adminHistoryRoutes    = require('./routes/adminHistoryRoutes');
 const combinedHistoryRoutes = require('./routes/combinedHistoryRoutes');
+const songRequestRoutes     = require('./routes/songRequests');
 
 
 // ─────────────────────────────────────────────
@@ -159,9 +160,37 @@ mongoose.connect(process.env.MONGO_URI)
 // ─────────────────────────────────────────────
 // 8. SOCKET.IO EVENTS
 // ─────────────────────────────────────────────
+// In-memory chat buffer — last 50 messages, reset at midnight
+let chatMessages = [];
+const MAX_CHAT = 50;
+
+const midnightReset = () => {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  setTimeout(() => { chatMessages = []; io.emit('chatClear'); midnightReset(); }, midnight - now);
+};
+midnightReset();
+
 io.on('connection', (socket) => {
   console.log('🔌 User connected:', socket.id);
   socket.emit('nowPlaying', getCurrentSong());
+
+  // Send recent chat history to the new connection
+  socket.emit('chatHistory', chatMessages);
+
+  // Handle incoming chat message
+  socket.on('chatMessage', (data) => {
+    if (!data?.text?.trim() || data.text.length > 300) return;
+    const msg = {
+      id:       Date.now().toString(),
+      text:     data.text.trim().slice(0, 300),
+      username: (data.username || 'Auditeur').slice(0, 50),
+      at:       new Date().toISOString(),
+    };
+    chatMessages = [...chatMessages.slice(-(MAX_CHAT - 1)), msg];
+    io.emit('chatMessage', msg);
+  });
 
   socket.on('disconnect', () => {
     console.log('❌ User disconnected:', socket.id);
@@ -202,6 +231,7 @@ app.use('/api/combined-history', combinedHistoryRoutes);
 app.use('/api/emissions',        emissionRoutes);
 app.use('/api/stats',            statsRoutes);
 app.use('/api/affiches',         afficheRoutes);
+app.use('/api/song-requests',    songRequestRoutes);
 
 // ─────────────────────────────────────────────
 // 11. GESTIONNAIRES D'ERREURS
