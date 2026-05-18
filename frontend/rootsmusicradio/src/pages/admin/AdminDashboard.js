@@ -1561,7 +1561,6 @@ const NAV = [
   { to: '/admin/programs',     icon: 'bi-calendar3',       label: 'Programmes' },
   { to: '/admin/episodes',     icon: 'bi-collection-play', label: 'Épisodes' },
   { to: '/admin/emissions',    icon: 'bi-broadcast',       label: 'Émissions' },
-  { to: '/admin/podcasts',     icon: 'bi-headphones',      label: 'Podcasts' },
   { to: '/admin/affiches',     icon: 'bi-images',          label: 'Affiches' },
   { to: '/admin/stats',        icon: 'bi-bar-chart',       label: 'Statistiques' },
 ];
@@ -1569,7 +1568,6 @@ const NAV = [
 const QUICK = [
   { to: '/admin/programs',  icon: 'bi-calendar3',       label: 'Programme',  color: 'asi-blue' },
   { to: '/admin/episodes',  icon: 'bi-collection-play', label: 'Épisode',    color: 'asi-green' },
-  { to: '/admin/podcasts',  icon: 'bi-headphones',      label: 'Podcast',    color: 'asi-purple' },
   { to: '/admin/affiches',  icon: 'bi-images',          label: 'Affiche',    color: 'asi-orange' },
   { to: '/admin/emissions', icon: 'bi-broadcast',       label: 'Émission',   color: 'asi-red' },
 ];
@@ -1578,9 +1576,9 @@ const PIE_COLORS = ['#0071e3','#34c759','#ff9500','#ff3b30','#af52de','#5ac8fa']
 
 export default function AdminDashboard() {
   const location = useLocation();
-  const { getProgramsStats, getEpisodesStats, getPodcastsStats } = useRadio();
+  const { getProgramsStats, getEpisodesStats, currentSong } = useRadio();
 
-  const [stats, setStats]               = useState({ programs: {total:0,active:0,featured:0}, episodes: {total:0,totalDuration:0}, podcasts: {total:0,totalDownloads:0,totalLikes:0} });
+  const [stats, setStats]               = useState({ programs: {total:0,active:0,featured:0}, episodes: {total:0,totalDuration:0} });
   const [weeklyData, setWeeklyData]     = useState([]);
   const [categoryData, setCategoryData] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
@@ -1603,15 +1601,14 @@ export default function AdminDashboard() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [ps, es, pods] = await Promise.all([
-        getProgramsStats(), getEpisodesStats(), getPodcastsStats()
+      const [ps, es] = await Promise.all([
+        getProgramsStats(), getEpisodesStats()
       ]);
-      setStats({ programs: ps, episodes: es, podcasts: pods });
+      setStats({ programs: ps, episodes: es });
     } catch {
       setStats({
         programs: { total: 12, active: 8, featured: 3 },
         episodes: { total: 245, totalDuration: 892800 },
-        podcasts: { total: 67, totalDownloads: 15420, totalLikes: 3240 }
       });
     }
 
@@ -1631,12 +1628,12 @@ export default function AdminDashboard() {
     setRecentActivity([
       { icon: 'bi-plus-circle', color: 'asi-blue',   title: 'Programme créé',        detail: 'Morning Show', time: 'Il y a 2h' },
       { icon: 'bi-pencil',      color: 'asi-orange',  title: 'Épisode modifié',       detail: 'Jazz Lounge EP05', time: 'Il y a 4h' },
-      { icon: 'bi-download',    color: 'asi-green',   title: 'Podcast téléchargé',    detail: 'Histoire de la Radio', time: 'Il y a 6h' },
+      { icon: 'bi-broadcast',   color: 'asi-green',   title: 'Émission diffusée',     detail: 'Morning Show', time: 'Il y a 6h' },
       { icon: 'bi-upload',      color: 'asi-purple',  title: 'Fichier uploadé',       detail: 'intro.mp3', time: 'Il y a 8h' },
     ]);
 
     setLoading(false);
-  }, [getProgramsStats, getEpisodesStats, getPodcastsStats]);
+  }, [getProgramsStats, getEpisodesStats]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
@@ -1668,10 +1665,10 @@ export default function AdminDashboard() {
   );
 
   const STATS = [
-    { icon: 'bi-broadcast',       color: 'asi-blue',   val: stats.programs.total,          lbl: 'Programmes',      sub: `${stats.programs.active || 0} actifs` },
-    { icon: 'bi-collection-play', color: 'asi-green',  val: stats.episodes.total,          lbl: 'Épisodes',        sub: formatDuration(stats.episodes.totalDuration || 0) },
-    { icon: 'bi-headphones',      color: 'asi-purple', val: stats.podcasts.total,          lbl: 'Podcasts',        sub: `${stats.podcasts.totalDownloads || 0} téléch.` },
-    { icon: 'bi-heart-fill',      color: 'asi-red',    val: stats.podcasts.totalLikes || 0, lbl: "J'aimes",         sub: '+12% cette sem.' },
+    { icon: 'bi-broadcast',       color: 'asi-blue',   val: stats.programs.total,            lbl: 'Programmes',    sub: `${stats.programs.active || 0} actifs` },
+    { icon: 'bi-collection-play', color: 'asi-green',  val: stats.episodes.total,            lbl: 'Épisodes',      sub: formatDuration(stats.episodes.totalDuration || 0) },
+    { icon: 'bi-people',          color: 'asi-purple', val: currentSong?.listeners || 0,     lbl: 'Auditeurs',     sub: 'En temps réel' },
+    { icon: 'bi-star-fill',       color: 'asi-orange', val: stats.programs.featured || 0,    lbl: 'En vedette',    sub: 'Programmes mis en avant' },
   ];
 
   return (

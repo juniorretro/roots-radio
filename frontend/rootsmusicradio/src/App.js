@@ -236,7 +236,6 @@ import Home from './pages/Home';
 import Programs from './pages/Programs';
 import ProgramDetail from './pages/ProgramDetail';
 import Episodes from './pages/Episodes';
-import Podcasts from './pages/Podcasts';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
@@ -247,7 +246,6 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminAffiches from './pages/admin/AdminAffiches';
 import AdminPrograms from './pages/admin/AdminPrograms';
 import AdminEpisodes from './pages/admin/AdminEpisodes';
-import AdminPodcasts from './pages/admin/AdminPodcasts';
 import AdminStats from './pages/admin/AdminStats';
 import AdminCombinedHistory from './pages/admin/AdminCombinedHistory';
 import AdminEmissions from './pages/admin/AdminEmissions';
@@ -304,7 +302,6 @@ function App() {
                 <Route path="/programs/:slug" element={<ProgramDetail />} />
                 <Route path="/emissions" element={<Emissions />} />
                 <Route path="/episodes" element={<Episodes />} />
-                <Route path="/podcasts" element={<Podcasts />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
@@ -324,11 +321,6 @@ function App() {
                 <Route path="/admin/episodes" element={
                   <ProtectedRoute adminOnly={true}>
                     <AdminEpisodes />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/podcasts" element={
-                  <ProtectedRoute adminOnly={true}>
-                    <AdminPodcasts />
                   </ProtectedRoute>
                 } />
                 <Route path="/admin/stats" element={

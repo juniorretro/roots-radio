@@ -36,7 +36,6 @@ export const NAV_ITEMS = [
   { to:'/admin/programs',     icon:'calendar3',       label:'Programmes'      },
   { to:'/admin/episodes',     icon:'collection-play', label:'Épisodes'        },
   { to:'/admin/emissions',    icon:'broadcast',       label:'Émissions'       },
-  { to:'/admin/podcasts',     icon:'headphones',      label:'Podcasts'        },
   { to:'/admin/affiches',     icon:'images',          label:'Affiches'        },
   { to:'/admin/history',      icon:'clock-history',   label:'Historique'      },
   { to:'/admin/stats',        icon:'bar-chart',       label:'Statistiques'    },
