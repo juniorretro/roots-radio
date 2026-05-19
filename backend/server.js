@@ -15,6 +15,11 @@ require('dotenv').config();
 // ─────────────────────────────────────────────
 // 0. VALIDATION DES VARIABLES D'ENVIRONNEMENT
 // ─────────────────────────────────────────────
+
+// Accepte MONGO_URI ou MONGODB_URI (Render utilise MONGODB_URI)
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
+if (MONGO_URI) process.env.MONGO_URI = MONGO_URI;
+
 const requiredEnvVars = ['JWT_SECRET', 'MONGO_URI'];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
@@ -59,7 +64,12 @@ const server = http.createServer(app);
 // ─────────────────────────────────────────────
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
   .split(',')
-  .map(o => o.trim());
+  .map(o => {
+    o = o.trim();
+    // Ajoute https:// si l'origine n'a pas de protocole
+    if (o && !o.startsWith('http://') && !o.startsWith('https://')) return `https://${o}`;
+    return o;
+  });
 
 // En développement : accepter aussi localhost:3001 et 3000
 if (isDev) {
