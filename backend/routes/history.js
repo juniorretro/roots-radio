@@ -189,7 +189,7 @@ const { adminAuth } = require('../middleware/auth');
 
 // Exclut les entrées contenant des mots-clés de jingles/pubs
 const JINGLE_FILTER = {
-  title: { $not: /jingle|jingles|pub |publicité|spot|promo|annonce|commercial/i }
+  title: { $not: /jingle|jingles|intro\b|pub\b|publicité|spot\b|promo|annonce|commercial|top horaire|non stop|indicatif|générique/i }
 };
 
 /**

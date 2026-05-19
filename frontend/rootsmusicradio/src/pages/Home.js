@@ -10,6 +10,10 @@ import api from '../services/api';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const resolveImg = (url) => (!url || url.startsWith('http')) ? url : `${API_URL}${url}`;
 
+const NON_MUSIC_PATTERN = /jingle|jingles|intro\b|pub\b|publicité|promo|spot\b|annonce|commercial|top horaire|non stop|indicatif|générique/i;
+const isNonMusic = (title = '', artist = '') =>
+  NON_MUSIC_PATTERN.test(title) || NON_MUSIC_PATTERN.test(artist);
+
 const Home = () => {
   const { t } = useTranslation();
   const { currentProgram, getActivePrograms, playHistory, nowPlaying, socket } = useRadio();
@@ -76,6 +80,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!nowPlaying?.title) return;
+    if (isNonMusic(nowPlaying.title, nowPlaying.artist)) return;
     const prev = prevNowPlayingRef.current;
     if (prev && prev.title === nowPlaying.title && prev.artist === nowPlaying.artist) return;
     prevNowPlayingRef.current = nowPlaying;
@@ -91,6 +96,7 @@ const Home = () => {
     if (!socket) return;
     const handler = (data) => {
       if (!data?.title) return;
+      if (data.isFiltered || isNonMusic(data.title, data.artist)) return;
       const e = { _id: `socket-${Date.now()}`, title: data.title, artist: data.artist || '', cover: data.cover || '/images/default-cover.png', playedAt: new Date().toISOString(), _isCurrentlyPlaying: true };
       setCombinedHistory(prev => {
         const clean = prev.map(i => ({ ...i, _isCurrentlyPlaying: false }));
