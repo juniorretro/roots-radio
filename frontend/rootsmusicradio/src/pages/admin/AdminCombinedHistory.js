@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import {
   A, AppleLayout, AppleCard, CardHeader,
@@ -28,7 +28,7 @@ const AdminCombinedHistory = () => {
   const loadHistory = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/combined-history?limit=100');
+      const res = await api.get('/api/combined-history?limit=100');
       setCombinedHistory(res.data.history || []);
     } catch {
       toast.error('Erreur de chargement');
@@ -38,14 +38,14 @@ const AdminCombinedHistory = () => {
 
   const loadStats = async () => {
     try {
-      const res = await axios.get('/api/combined-history/stats');
+      const res = await api.get('/api/combined-history/stats');
       setStats(res.data.stats);
     } catch { /* stats are optional */ }
   };
 
   const loadPrograms = async () => {
     try {
-      const res = await axios.get('/api/programs');
+      const res = await api.get('/api/programs');
       setPrograms(res.data.programs || res.data || []);
     } catch { /* programs are optional */ }
   };
@@ -54,9 +54,9 @@ const AdminCombinedHistory = () => {
     if (!window.confirm(`Supprimer "${item.title}" de l'historique ?`)) return;
     try {
       if (item.type === 'track') {
-        await axios.delete(`/api/combined-history/track/${item._id}`);
+        await api.delete(`/api/combined-history/track/${item._id}`);
       } else {
-        await axios.delete(`/api/combined-history/emission/${item._id}`);
+        await api.delete(`/api/combined-history/emission/${item._id}`);
       }
       toast.success('Élément supprimé');
       loadHistory();
@@ -69,7 +69,7 @@ const AdminCombinedHistory = () => {
   const handleAddEmission = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/combined-history/emission', emissionForm);
+      await api.post('/api/combined-history/emission', emissionForm);
       toast.success("Émission ajoutée à l'historique");
       setShowModal(false);
       setEmissionForm({ title: '', host: '', programId: '', cover: '', duration: '', description: '', category: 'Émission' });

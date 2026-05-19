@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import {
   A, AppleLayout, AppleCard, CardHeader,
@@ -18,7 +18,7 @@ const AdminSongRequests = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/song-requests');
+      const res = await api.get('/api/song-requests');
       setRequests(res.data.requests || []);
     } catch { toast.error('Erreur de chargement'); }
     setLoading(false);
@@ -28,7 +28,7 @@ const AdminSongRequests = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await axios.patch(`/api/song-requests/${id}`, { status });
+      await api.patch(`/api/song-requests/${id}`, { status });
       setRequests(r => r.map(x => x._id === id ? { ...x, status } : x));
       toast.success('Statut mis à jour');
     } catch { toast.error('Erreur'); }
@@ -37,7 +37,7 @@ const AdminSongRequests = () => {
   const remove = async (id) => {
     if (!window.confirm('Supprimer cette demande ?')) return;
     try {
-      await axios.delete(`/api/song-requests/${id}`);
+      await api.delete(`/api/song-requests/${id}`);
       setRequests(r => r.filter(x => x._id !== id));
       toast.success('Supprimée');
     } catch { toast.error('Erreur'); }

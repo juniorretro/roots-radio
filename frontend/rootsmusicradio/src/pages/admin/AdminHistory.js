@@ -22,7 +22,7 @@
 //   const loadHistory = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await axios.get('/api/history?limit=100');
+//       const response = await api.get('/api/history?limit=100');
 //       setHistory(response.data.history || []);
 //     } catch (error) {
 //       console.error('Error loading history:', error);
@@ -33,7 +33,7 @@
 
 //   const loadSuspiciousTracks = async () => {
 //     try {
-//       const response = await axios.get('/api/admin/history/suspicious?limit=50');
+//       const response = await api.get('/api/admin/history/suspicious?limit=50');
 //       setSuspiciousTracks(response.data.tracks || []);
 //     } catch (error) {
 //       console.error('Error loading suspicious tracks:', error);
@@ -42,7 +42,7 @@
 
 //   const loadStats = async () => {
 //     try {
-//       const response = await axios.get('/api/history/stats');
+//       const response = await api.get('/api/history/stats');
 //       setStats(response.data.stats);
 //     } catch (error) {
 //       console.error('Error loading stats:', error);
@@ -56,7 +56,7 @@
 
 //     setLoading(true);
 //     try {
-//       const response = await axios.post('/api/admin/history/clean-ads');
+//       const response = await api.post('/api/admin/history/clean-ads');
 //       toast.success(`✅ ${response.data.deleted} publicités supprimées`);
 //       loadHistory();
 //       loadSuspiciousTracks();
@@ -73,7 +73,7 @@
 //     }
 
 //     try {
-//       await axios.delete(`/api/admin/history/${id}`);
+//       await api.delete(`/api/admin/history/${id}`);
 //       toast.success('Track supprimé');
 //       loadHistory();
 //       loadSuspiciousTracks();
@@ -85,7 +85,7 @@
 
 //   const analyzeTrack = async (track) => {
 //     try {
-//       const response = await axios.post('/api/admin/history/analyze-track', track);
+//       const response = await api.post('/api/admin/history/analyze-track', track);
 //       setSelectedTrack({
 //         ...track,
 //         analysis: response.data
@@ -103,7 +103,7 @@
 //     }
 
 //     try {
-//       await axios.post('/api/admin/history/add-blacklist', {
+//       await api.post('/api/admin/history/add-blacklist', {
 //         keyword: newKeyword,
 //         type: keywordType
 //       });
@@ -405,7 +405,7 @@
 // AdminHistory.jsx — Apple Design System
 // ════════════════════════════════════════════════════════════════════════
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import { A, AppleLayout, AppleCard, CardHeader, AppleBtn, AppleLinkBtn, AppleBadge, AppleTable, AppleTr, AppleTd, AppleThumb, AppleInput, AppleSelect, AppleFormGroup, AppleAlert, AppleEmpty, AppleSpinner } from './AppleAdmin.shared';
 
@@ -426,9 +426,9 @@ export const AdminHistory = () => {
     setLoading(true);
     try {
       const [h, s, st] = await Promise.all([
-        axios.get('/api/history?limit=100'),
-        axios.get('/api/admin/history/suspicious?limit=50').catch(() => ({ data:{ tracks:[] } })),
-        axios.get('/api/history/stats').catch(() => ({ data:{ stats:null } })),
+        api.get('/api/history?limit=100'),
+        api.get('/api/admin/history/suspicious?limit=50').catch(() => ({ data:{ tracks:[] } })),
+        api.get('/api/history/stats').catch(() => ({ data:{ stats:null } })),
       ]);
       setHistory(h.data.history||[]);
       setSuspicious(s.data.tracks||[]);
@@ -441,21 +441,21 @@ export const AdminHistory = () => {
 
   const cleanAds = async () => {
     if (!window.confirm('Nettoyer toutes les publicités de l\'historique ?')) return;
-    try { const r = await axios.post('/api/admin/history/clean-ads'); toast.success(`${r.data.deleted} publicités supprimées`); load(); }
+    try { const r = await api.post('/api/admin/history/clean-ads'); toast.success(`${r.data.deleted} publicités supprimées`); load(); }
     catch { toast.error('Erreur nettoyage'); }
   };
 
   const deleteTrack = async (id, type='track') => {
     if (!window.confirm('Supprimer cet élément ?')) return;
     try {
-      await axios.delete(`/api/admin/history/${id}`);
+      await api.delete(`/api/admin/history/${id}`);
       toast.success('Supprimé'); load();
     } catch { toast.error('Erreur suppression'); }
   };
 
   const addBlacklist = async () => {
     if (!keyword.trim()) { showAlert('danger','Mot-clé requis'); return; }
-    try { await axios.post('/api/admin/history/add-blacklist', { keyword:keyword.trim(), type:kwType }); toast.success(`"${keyword}" ajouté`); setKeyword(''); }
+    try { await api.post('/api/admin/history/add-blacklist', { keyword:keyword.trim(), type:kwType }); toast.success(`"${keyword}" ajouté`); setKeyword(''); }
     catch { toast.error('Erreur'); }
   };
 
