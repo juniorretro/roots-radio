@@ -1561,8 +1561,9 @@ const NAV = [
   { to: '/admin/programs',     icon: 'bi-calendar3',       label: 'Programmes' },
   { to: '/admin/episodes',     icon: 'bi-collection-play', label: 'Épisodes' },
   { to: '/admin/emissions',    icon: 'bi-broadcast',       label: 'Émissions' },
-  { to: '/admin/affiches',     icon: 'bi-images',          label: 'Affiches' },
-  { to: '/admin/stats',        icon: 'bi-bar-chart',       label: 'Statistiques' },
+  { to: '/admin/affiches',      icon: 'bi-images',          label: 'Affiches' },
+  { to: '/admin/song-requests', icon: 'bi-music-note-list', label: 'Demandes' },
+  { to: '/admin/stats',         icon: 'bi-bar-chart',       label: 'Statistiques' },
 ];
 
 const QUICK = [
