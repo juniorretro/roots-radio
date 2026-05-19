@@ -1,11 +1,10 @@
 # dependencies
 node_modules/
 
-# env files
+# env files (local only — .env.production is committed intentionally, no secrets)
 .env
 .env.local
 .env.development
-.env.production
 
 # builds
 build/

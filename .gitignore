@@ -5,8 +5,8 @@ node_modules/
 # Environment variables - NE JAMAIS COMMITTER
 .env
 .env.local
-.env.production
 backend/.env
+# .env.production autorisé : contient uniquement l'URL publique du backend
 
 # Build
 build/
