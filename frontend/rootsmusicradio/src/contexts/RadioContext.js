@@ -138,6 +138,8 @@ export const RadioProvider = ({ children }) => {
         listeners: data.listeners || 0,
       };
       setNowPlaying(newTrack);
+      // Ne pas notifier ni ajouter à l'historique si c'est un jingle/pub filtré
+      if (data.isFiltered) return;
       notifyNowPlaying(newTrack);
       setPlayHistory(prev => {
         const dup = prev[0]?.title === newTrack.title && prev[0]?.artist === newTrack.artist;

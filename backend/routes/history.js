@@ -187,6 +187,11 @@ const router = express.Router();
 const PlayHistory = require('../models/PlayHistory');
 const { adminAuth } = require('../middleware/auth');
 
+// Exclut les entrées contenant des mots-clés de jingles/pubs
+const JINGLE_FILTER = {
+  title: { $not: /jingle|jingles|pub |publicité|spot|promo|annonce|commercial/i }
+};
+
 /**
  * @route   GET /api/history
  * @desc    Récupérer l'historique récent
@@ -197,7 +202,7 @@ router.get('/', async (req, res) => {
   try {
     const limit = Math.min(parseInt(req.query.limit) || 50, 100);
 
-    const history = await PlayHistory.find()
+    const history = await PlayHistory.find(JINGLE_FILTER)
       .sort({ playedAt: -1 })
       .limit(limit)
       .lean();
@@ -246,7 +251,7 @@ router.get('/today', async (req, res) => {
  */
 router.get('/latest', async (req, res) => {
   try {
-    const latest = await PlayHistory.findOne()
+    const latest = await PlayHistory.findOne(JINGLE_FILTER)
       .sort({ playedAt: -1 })
       .lean();
 
