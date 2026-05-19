@@ -26,7 +26,7 @@ const Home = () => {
   const [currentAfficheIndex, setCurrentAfficheIndex] = useState(0);
   const prevNowPlayingRef = useRef(null);
 
-  const heroImages = [
+  const FALLBACK_HERO = [
     '/images/programs/GOOD_MORNING-AFFICHE.jpg',
     '/images/programs/HIT_30_AFFICHE.jpg',
     '/images/programs/LES_ROIS_DE_L_AFROBEAT.jpg',
@@ -39,17 +39,22 @@ const Home = () => {
     '/images/programs/SUMMER_MIX_BY_DJ_MATHIAS.jpg',
     '/images/programs/TOP_20_AFRICA_AFFICHE.jpg',
   ];
+  const [heroImages, setHeroImages] = useState(FALLBACK_HERO);
 
   useEffect(() => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [programs, afficheRes] = await Promise.all([
+        const [programs, afficheRes, heroRes] = await Promise.all([
           getActivePrograms(),
-          api.get('/api/affiches').catch(() => ({ data: { affiches: [] } }))
+          api.get('/api/affiches').catch(() => ({ data: { affiches: [] } })),
+          api.get('/api/carousel?type=hero').catch(() => ({ data: { items: [] } })),
         ]);
         setFeaturedPrograms(programs.filter(p => p.featured).slice(0, 3));
         setAffiches(afficheRes.data?.affiches || []);
+        if (heroRes.data?.items?.length) {
+          setHeroImages(heroRes.data.items.map(i => resolveImg(i.image)));
+        }
       } catch (error) {
         console.error('Failed to fetch content:', error);
       } finally {

@@ -1563,6 +1563,7 @@ const NAV = [
   { to: '/admin/emissions',    icon: 'bi-broadcast',       label: 'Émissions' },
   { to: '/admin/affiches',      icon: 'bi-images',          label: 'Affiches' },
   { to: '/admin/song-requests', icon: 'bi-music-note-list', label: 'Demandes' },
+  { to: '/admin/carousels',     icon: 'bi-collection',      label: 'Carrousels' },
   { to: '/admin/stats',         icon: 'bi-bar-chart',       label: 'Statistiques' },
 ];
 

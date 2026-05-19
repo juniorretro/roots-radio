@@ -51,6 +51,7 @@ const streamRoutes          = require('./routes/streamRoutes');
 const adminHistoryRoutes    = require('./routes/adminHistoryRoutes');
 const combinedHistoryRoutes = require('./routes/combinedHistoryRoutes');
 const songRequestRoutes     = require('./routes/songRequests');
+const carouselRoutes        = require('./routes/carousel');
 
 
 // ─────────────────────────────────────────────
@@ -242,6 +243,7 @@ app.use('/api/emissions',        emissionRoutes);
 app.use('/api/stats',            statsRoutes);
 app.use('/api/affiches',         afficheRoutes);
 app.use('/api/song-requests',    songRequestRoutes);
+app.use('/api/carousel',         carouselRoutes);
 
 // ─────────────────────────────────────────────
 // 11. GESTIONNAIRES D'ERREURS

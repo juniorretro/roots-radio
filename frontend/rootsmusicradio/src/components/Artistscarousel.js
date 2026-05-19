@@ -1,71 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 import './Artistscarousel.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const resolveImg = (url) => (!url || url.startsWith('http')) ? url : `${API_URL}${url}`;
+
+const FALLBACK_ARTISTS = [
+  { _id: '1', name: 'Sabrina',     image: '/images/artists/sabrina.jpg',   subtitle: 'Afrobeat'  },
+  { _id: '2', name: 'Burna Boy',   image: '/images/artists/burna-boy.jpg', subtitle: 'Afrofusion' },
+  { _id: '3', name: 'Wizkid',      image: '/images/artists/wizkid.jpg',    subtitle: 'Afrobeat'  },
+  { _id: '4', name: 'Davido',      image: '/images/artists/davido.jpg',    subtitle: 'Afropop'   },
+  { _id: '5', name: 'Tems',        image: '/images/artists/tems.jpg',      subtitle: 'R&B/Soul'  },
+  { _id: '6', name: 'Fireboy DML', image: '/images/artists/fireboy.jpg',   subtitle: 'Afropop'   },
+  { _id: '7', name: 'Asake',       image: '/images/artists/asake.jpg',     subtitle: 'Afrobeat'  },
+  { _id: '8', name: 'Rema',        image: '/images/artists/rema.jpg',      subtitle: 'Afrorave'  },
+];
+
 const ArtistsCarousel = () => {
+  const [artists, setArtists]       = useState(FALLBACK_ARTISTS);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 🎵 Liste des artistes à afficher
-  const artists = [
-    {
-      id: 1,
-      name: 'Sabrina',
-      image: '/images/artists/sabrina.jpg',
-      genre: 'Afrobeat'
-    },
-    {
-      id: 2,
-      name: 'Burna Boy',
-      image: '/images/artists/burna-boy.jpg',
-      genre: 'Afrofusion'
-    },
-    {
-      id: 3,
-      name: 'Wizkid',
-      image: '/images/artists/wizkid.jpg',
-      genre: 'Afrobeat'
-    },
-    {
-      id: 4,
-      name: 'Davido',
-      image: '/images/artists/davido.jpg',
-      genre: 'Afropop'
-    },
-    {
-      id: 5,
-      name: 'Tems',
-      image: '/images/artists/tems.jpg',
-      genre: 'R&B/Soul'
-    },
-    {
-      id: 6,
-      name: 'Fireboy DML',
-      image: '/images/artists/fireboy.jpg',
-      genre: 'Afropop'
-    },
-    {
-      id: 7,
-      name: 'Asake',
-      image: '/images/artists/asake.jpg',
-      genre: 'Afrobeat'
-    },
-    {
-      id: 8,
-      name: 'Rema',
-      image: '/images/artists/rema.jpg',
-      genre: 'Afrorave'
-    }
-  ];
+  useEffect(() => {
+    api.get('/api/carousel?type=artist')
+      .then(r => { if (r.data.items?.length) setArtists(r.data.items); })
+      .catch(() => {});
+  }, []);
 
-  // Défilement automatique toutes les 4 secondes
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % artists.length);
+      setCurrentIndex(prev => (prev + 1) % artists.length);
     }, 4000);
-
     return () => clearInterval(interval);
   }, [artists.length]);
 
-  // Obtenir 3 artistes à afficher (précédent, courant, suivant)
   const getVisibleArtists = () => {
     const prev = (currentIndex - 1 + artists.length) % artists.length;
     const next = (currentIndex + 1) % artists.length;
@@ -76,48 +43,29 @@ const ArtistsCarousel = () => {
 
   return (
     <div className="artists-carousel-container">
-      {/* Titre */}
-      {/* <div className="carousel-header">
-         <h1 className="carousel-main-title">
-        
-        </h1>
-        <p className="carousel-subtitle">
-          Where Everything Starts
-        </p> 
-      
-
-      </div> */}
-
-      {/* Carrousel d'artistes */}
       <div className="artists-carousel">
         <div className="carousel-track">
           {visibleArtists.map((artist, index) => (
             <div
-              key={`${artist.id}-${index}`}
+              key={`${artist._id}-${index}`}
               className={`artist-card ${index === 1 ? 'active' : ''} ${index === 0 ? 'prev' : ''} ${index === 2 ? 'next' : ''}`}
             >
               <div className="artist-image-wrapper">
                 <img
-                  src={artist.image}
-                  alt={artist.name}
+                  src={resolveImg(artist.image)}
+                  alt={artist.name || ''}
                   className="artist-image"
-                  onError={(e) => {
-                    // Fallback si image manquante
-                    e.target.src = '/images/artists/placeholder.jpg';
-                  }}
+                  onError={e => { e.target.src = '/images/artists/placeholder.jpg'; }}
                 />
-                <div className="artist-overlay"></div>
+                <div className="artist-overlay" />
               </div>
-              
               <div className="artist-info">
-                <h3 className="artist-name">{artist.name}</h3>
-                <p className="artist-genre">{artist.genre}</p>
+                <h3 className="artist-name">{artist.name || ''}</h3>
+                <p className="artist-genre">{artist.subtitle || artist.genre || ''}</p>
               </div>
-
-              {/* Badge "À l'antenne" pour l'artiste actif */}
               {index === 1 && (
                 <div className="on-air-badge">
-                  <span className="pulse-dot"></span>
+                  <span className="pulse-dot" />
                   En rotation
                 </div>
               )}
@@ -125,40 +73,22 @@ const ArtistsCarousel = () => {
           ))}
         </div>
 
-        {/* Indicateurs de navigation */}
         <div className="carousel-indicators">
           {artists.map((_, index) => (
-            <button
-              key={index}
-              className={`indicator ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => setCurrentIndex(index)}
-              aria-label={`Aller à l'artiste ${index + 1}`}
-            />
+            <button key={index} className={`indicator ${index === currentIndex ? 'active' : ''}`} onClick={() => setCurrentIndex(index)} aria-label={`Artiste ${index + 1}`} />
           ))}
         </div>
 
-        {/* Boutons de navigation */}
-        <button
-          className="carousel-nav prev-btn"
-          onClick={() => setCurrentIndex((prev) => (prev - 1 + artists.length) % artists.length)}
-          aria-label="Artiste précédent"
-        >
-          <i className="bi bi-chevron-left"></i>
+        <button className="carousel-nav prev-btn" onClick={() => setCurrentIndex(p => (p - 1 + artists.length) % artists.length)} aria-label="Précédent">
+          <i className="bi bi-chevron-left" />
         </button>
-        <button
-          className="carousel-nav next-btn"
-          onClick={() => setCurrentIndex((prev) => (prev + 1) % artists.length)}
-          aria-label="Artiste suivant"
-        >
-          <i className="bi bi-chevron-right"></i>
+        <button className="carousel-nav next-btn" onClick={() => setCurrentIndex(p => (p + 1) % artists.length)} aria-label="Suivant">
+          <i className="bi bi-chevron-right" />
         </button>
       </div>
 
-      {/* Tagline */}
       <div className="carousel-footer">
-        <p className="carousel-tagline">
-          Émissions · Podcasts · Musique
-        </p>
+        <p className="carousel-tagline">Émissions · Podcasts · Musique</p>
       </div>
     </div>
   );

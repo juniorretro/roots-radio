@@ -256,6 +256,7 @@ import AdminStats from './pages/admin/AdminStats';
 import AdminCombinedHistory from './pages/admin/AdminCombinedHistory';
 import AdminEmissions from './pages/admin/AdminEmissions';
 import AdminSongRequests from './pages/admin/AdminSongRequests';
+import AdminCarousels from './pages/admin/AdminCarousels';
 
 
 
@@ -342,6 +343,11 @@ function App() {
                 <Route path="/admin/song-requests" element={
                   <ProtectedRoute adminOnly={true}>
                     <AdminSongRequests />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/carousels" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <AdminCarousels />
                   </ProtectedRoute>
                 } />
               </Routes>
