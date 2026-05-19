@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const resolveImg = (url) => (!url || url.startsWith('http')) ? url : `${API_URL}${url}`;
+
 const AffichesBanner = () => {
   const [affiches, setAffiches] = useState([]);
   const [current, setCurrent]   = useState(0);
@@ -40,7 +43,7 @@ const AffichesBanner = () => {
       >
         <img
           key={a._id}
-          src={a.image}
+          src={resolveImg(a.image)}
           alt={a.title}
           style={{
             width: '100%',

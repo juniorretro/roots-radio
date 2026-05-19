@@ -7,6 +7,9 @@ import ArtistsCarousel from '../components/Artistscarousel';
 import FavoriteBtn from '../components/FavoriteBtn';
 import api from '../services/api';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const resolveImg = (url) => (!url || url.startsWith('http')) ? url : `${API_URL}${url}`;
+
 const Home = () => {
   const { t } = useTranslation();
   const { currentProgram, getActivePrograms, playHistory, nowPlaying, socket } = useRadio();
@@ -167,7 +170,7 @@ const Home = () => {
               <div style={{ position: 'relative', minHeight: 'clamp(220px, 40vw, 420px)', background: '#111' }}>
                 {affiches.map((affiche, idx) => (
                   <div key={affiche._id} style={{ position: idx === 0 ? 'relative' : 'absolute', inset: 0, opacity: idx === currentAfficheIndex ? 1 : 0, transition: 'opacity 1s ease', zIndex: idx === currentAfficheIndex ? 1 : 0 }}>
-                    <img src={affiche.image} alt={affiche.title} style={{ width: '100%', minHeight: 'clamp(220px, 40vw, 420px)', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.target.style.display = 'none'; }} />
+                    <img src={resolveImg(affiche.image)} alt={affiche.title} style={{ width: '100%', minHeight: 'clamp(220px, 40vw, 420px)', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.target.style.display = 'none'; }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)' }} />
                     <div style={{ position: 'absolute', bottom: 0, left: 0, padding: 'clamp(20px, 4vw, 52px)', zIndex: 2, maxWidth: '60%' }}>
                       <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 8, fontWeight: 500 }}>Actualité</p>
@@ -197,7 +200,7 @@ const Home = () => {
                 {affiches.map((affiche, idx) => (
                   <Col xs={6} sm={4} md={3} key={affiche._id}>
                     <div className="affiche-thumb" onClick={() => setCurrentAfficheIndex(idx)} style={{ borderRadius: 14, overflow: 'hidden', border: `2px solid ${idx === currentAfficheIndex ? '#000' : 'transparent'}`, opacity: idx === currentAfficheIndex ? 1 : 0.6, transform: idx === currentAfficheIndex ? 'scale(1.02)' : 'scale(1)', transition: 'all 0.3s ease' }}>
-                      <img src={affiche.image} alt={affiche.title} style={{ width: '100%', height: 70, objectFit: 'cover', display: 'block' }} onError={e => { e.target.src = '/images/default-cover.png'; }} />
+                      <img src={resolveImg(affiche.image)} alt={affiche.title} style={{ width: '100%', height: 70, objectFit: 'cover', display: 'block' }} onError={e => { e.target.src = '/images/default-cover.png'; }} />
                       <div style={{ padding: '6px 10px', background: '#f5f5f5', fontSize: 11, fontWeight: 500, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{affiche.title}</div>
                     </div>
                   </Col>
