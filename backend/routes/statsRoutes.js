@@ -149,7 +149,7 @@ router.get('/', adminAuth, async (req, res) => {
 });
 
 // ✅ GET /api/stats/programs - Statistiques détaillées des programmes
-router.get('/programs', async (req, res) => {
+router.get('/programs', adminAuth, async (req, res) => {
   try {
     const totalPrograms = await Program.countDocuments();
     const activePrograms = await Program.countDocuments({ status: 'active' });
@@ -185,7 +185,7 @@ router.get('/programs', async (req, res) => {
 });
 
 // ✅ GET /api/stats/episodes - Statistiques des épisodes
-router.get('/episodes', async (req, res) => {
+router.get('/episodes', adminAuth, async (req, res) => {
   try {
     const totalEpisodes = await Episode.countDocuments();
     const airedEpisodes = await Episode.countDocuments({ status: 'aired' });
@@ -219,7 +219,7 @@ router.get('/episodes', async (req, res) => {
 });
 
 // ✅ GET /api/stats/podcasts - Statistiques des podcasts
-router.get('/podcasts', async (req, res) => {
+router.get('/podcasts', adminAuth, async (req, res) => {
   try {
     const totalPodcasts = await Podcast.countDocuments();
     const publishedPodcasts = await Podcast.countDocuments({ status: 'published' });
@@ -263,7 +263,7 @@ router.get('/podcasts', async (req, res) => {
 });
 
 // ✅ GET /api/stats/history - Statistiques de l'historique de diffusion
-router.get('/history', async (req, res) => {
+router.get('/history', adminAuth, async (req, res) => {
   try {
     const totalTracks = await PlayHistory.countDocuments();
     const totalEmissions = await Emission.countDocuments();
@@ -316,7 +316,7 @@ router.get('/history', async (req, res) => {
 });
 
 // ✅ GET /api/stats/users - Statistiques des utilisateurs
-router.get('/users', async (req, res) => {
+router.get('/users', adminAuth, async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const adminUsers = await User.countDocuments({ role: 'admin' });

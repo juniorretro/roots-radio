@@ -1550,6 +1550,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Spinner, Modal, Form } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import { useRadio } from '../../contexts/RadioContext';
+import api from '../../services/api';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell
@@ -1646,8 +1647,8 @@ export default function AdminDashboard() {
     try {
       const fd = new FormData();
       fd.append('file', uploadFile);
-      const res = await fetch('/api/upload', { method: 'POST', body: fd });
-      const data = await res.json();
+      const res = await api.post('/api/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const data = res.data;
       setUploadMsg(data.success ? `✓ Upload réussi : ${data.data?.url || ''}` : '✗ Échec');
       if (data.success) setTimeout(() => { setShowUpload(false); setUploadMsg(''); setUploadFile(null); }, 2200);
     } catch { setUploadMsg('✗ Erreur réseau'); }

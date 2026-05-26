@@ -15,20 +15,29 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
+const VERIFY_EMAIL = process.env.VERIFY_EMAIL || process.env.ADMIN_EMAIL || 'roots@radio.com';
+const VERIFY_PASSWORD = process.env.VERIFY_PASSWORD || process.env.ADMIN_PASSWORD;
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+if (!VERIFY_PASSWORD) {
+  console.error('VERIFY_PASSWORD ou ADMIN_PASSWORD est requis pour tester une connexion.');
+  process.exit(1);
+}
+
+if (!MONGO_URI) {
+  console.error('MONGO_URI ou MONGODB_URI est requis.');
+  process.exit(1);
+}
 
 const verifyLogin = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/radio');
+    await mongoose.connect(MONGO_URI);
     console.log('Connexion à MongoDB réussie');
 
-    // Test avec les identifiants admin
-    const testEmail = 'roots@radio.com';
-    const testPassword = 'password123';
-
-    console.log(`\n🔍 Recherche de l'utilisateur avec email: ${testEmail}`);
+    console.log(`\n🔍 Recherche de l'utilisateur avec email: ${VERIFY_EMAIL}`);
     
     // Chercher l'utilisateur
-    const user = await User.findOne({ email: testEmail });
+    const user = await User.findOne({ email: VERIFY_EMAIL });
     
     if (!user) {
       console.log('❌ Aucun utilisateur trouvé avec cet email');
@@ -37,7 +46,7 @@ const verifyLogin = async () => {
       const allUsers = await User.find();
       console.log('\n📋 Tous les utilisateurs en base:');
       allUsers.forEach(u => {
-        console.log(`  - Email: ${u.email}, Role: ${u.role}, Password hash: ${u.password ? u.password.substring(0, 20) + '...' : 'Pas de password'}`);
+        console.log(`  - Email: ${u.email}, Role: ${u.role}, Password: ${u.password ? 'présent' : 'absent'}`);
       });
       
       return;
@@ -48,7 +57,7 @@ const verifyLogin = async () => {
     console.log(`  - Username: ${user.username}`);
     console.log(`  - Email: ${user.email}`);
     console.log(`  - Role: ${user.role}`);
-    console.log(`  - Password hash: ${user.password ? user.password.substring(0, 30) + '...' : 'Pas de password'}`);
+    console.log(`  - Password: ${user.password ? 'présent' : 'absent'}`);
 
     // Vérifier le mot de passe
     if (!user.password) {
@@ -56,17 +65,16 @@ const verifyLogin = async () => {
       return;
     }
 
-    console.log(`\n🔐 Test du mot de passe: "${testPassword}"`);
+    console.log('\n🔐 Test du mot de passe fourni');
     
-    const isMatch = await bcrypt.compare(testPassword, user.password);
+    const isMatch = await bcrypt.compare(VERIFY_PASSWORD, user.password);
     console.log(`Résultat de la comparaison: ${isMatch ? '✅ MATCH' : '❌ PAS DE MATCH'}`);
 
     if (!isMatch) {
       console.log('\n🔧 Tentative de création d\'un nouveau hash pour vérification...');
-      const newHash = await bcrypt.hash(testPassword, 12);
-      console.log(`Nouveau hash: ${newHash.substring(0, 30)}...`);
+      const newHash = await bcrypt.hash(VERIFY_PASSWORD, 12);
       
-      const testNewHash = await bcrypt.compare(testPassword, newHash);
+      const testNewHash = await bcrypt.compare(VERIFY_PASSWORD, newHash);
       console.log(`Test avec nouveau hash: ${testNewHash ? '✅ FONCTIONNE' : '❌ NE FONCTIONNE PAS'}`);
     }
 

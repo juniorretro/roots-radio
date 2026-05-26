@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+if (!MONGO_URI) {
+  console.error('MONGO_URI ou MONGODB_URI est requis.');
+  process.exit(1);
+}
+
 const testConnection = async () => {
   try {
     console.log('Tentative de connexion à MongoDB...');
-    console.log('URI:', process.env.MONGO_URI);
     
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/radio');
+    await mongoose.connect(MONGO_URI);
     console.log('✅ Connexion à MongoDB réussie');
 
     // Test de création d'un document simple

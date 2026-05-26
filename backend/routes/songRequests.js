@@ -1,6 +1,8 @@
 const express = require('express');
 const router  = express.Router();
 const mongoose = require('mongoose');
+const { body, param, validationResult } = require('express-validator');
+const { adminAuth } = require('../middleware/auth');
 
 // ── Schema inline (simple, no separate model file needed) ─────────────────────
 const requestSchema = new mongoose.Schema({
@@ -15,10 +17,19 @@ const requestSchema = new mongoose.Schema({
 const SongRequest = mongoose.models.SongRequest || mongoose.model('SongRequest', requestSchema);
 
 // POST /api/song-requests — submit a request (public)
-router.post('/', async (req, res) => {
+router.post('/', [
+  body('title').trim().notEmpty().withMessage('Le titre est obligatoire.').isLength({ max: 200 }),
+  body('artist').optional().trim().isLength({ max: 200 }),
+  body('message').optional().trim().isLength({ max: 500 }),
+  body('listener').optional().trim().isLength({ max: 100 }),
+], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
     const { title, artist, message, listener } = req.body;
-    if (!title?.trim()) return res.status(400).json({ success: false, message: 'Le titre est obligatoire.' });
 
     const request = await SongRequest.create({ title, artist, message, listener });
     res.status(201).json({ success: true, request });
@@ -28,7 +39,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/song-requests — list all (admin)
-router.get('/', async (req, res) => {
+router.get('/', adminAuth, async (req, res) => {
   try {
     const requests = await SongRequest.find().sort({ createdAt: -1 }).limit(100);
     res.json({ success: true, requests });
@@ -38,10 +49,18 @@ router.get('/', async (req, res) => {
 });
 
 // PATCH /api/song-requests/:id — update status (admin)
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', adminAuth, [
+  param('id').isMongoId().withMessage('ID invalide.'),
+  body('status').isIn(['pending', 'played', 'declined']).withMessage('Statut invalide.'),
+], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
     const { status } = req.body;
-    const updated = await SongRequest.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const updated = await SongRequest.findByIdAndUpdate(req.params.id, { status }, { new: true, runValidators: true });
     if (!updated) return res.status(404).json({ success: false, message: 'Demande introuvable.' });
     res.json({ success: true, request: updated });
   } catch {
@@ -50,8 +69,15 @@ router.patch('/:id', async (req, res) => {
 });
 
 // DELETE /api/song-requests/:id (admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', adminAuth, [
+  param('id').isMongoId().withMessage('ID invalide.'),
+], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
     await SongRequest.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   } catch {

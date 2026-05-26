@@ -79,7 +79,7 @@ if (isDev) {
   });
 }
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     // Autoriser les requêtes sans origin (Postman, mobile, etc.)
     if (!origin) return callback(null, true);
@@ -90,10 +90,12 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+app.use(cors(corsOptions));
 
 // Gérer les requêtes OPTIONS (preflight) explicitement
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // ─────────────────────────────────────────────
 // 2. SÉCURITÉ — Headers HTTP
@@ -134,6 +136,7 @@ const authLimiter = rateLimit({
 
 app.use('/api/', globalLimiter);
 app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 
 // ─────────────────────────────────────────────
 // 5. FICHIERS STATIQUES

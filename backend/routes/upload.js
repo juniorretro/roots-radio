@@ -6,6 +6,14 @@ const fs = require('fs');
 const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
+const DEFAULT_MAX_FILE_SIZE = 100 * 1024 * 1024;
+const configuredMaxFileSize = parseInt(process.env.MAX_FILE_SIZE, 10);
+const maxFileSize = Math.min(
+  Number.isFinite(configuredMaxFileSize) && configuredMaxFileSize > 0
+    ? configuredMaxFileSize
+    : DEFAULT_MAX_FILE_SIZE,
+  DEFAULT_MAX_FILE_SIZE
+);
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -25,58 +33,39 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter - Accepte tous les formats courants
+// File filter - médias uniquement, sans SVG/documents/archives exécutables ou risqués
 const fileFilter = (req, file, cb) => {
-  // Images
-  const imageTypes = /jpeg|jpg|png|gif|webp|bmp|tiff|tif|svg|ico|heic|heif/;
-  // Audio
-  const audioTypes = /mp3|wav|ogg|m4a|aac|flac|wma|aiff/;
-  // Vidéo
-  const videoTypes = /mp4|avi|mov|wmv|flv|webm|mkv|m4v/;
-  // Documents
-  const docTypes = /pdf|doc|docx|txt|rtf|odt|xls|xlsx|ppt|pptx/;
-  // Archives
-  const archiveTypes = /zip|rar|7z|tar|gz/;
-  
-  const allowedTypes = new RegExp(`${imageTypes.source}|${audioTypes.source}|${videoTypes.source}|${docTypes.source}|${archiveTypes.source}`, 'i');
-  
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  
-  // Vérification MIME type pour plus de sécurité
-  const allowedMimeTypes = [
-    // Images
-    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 
-    'image/bmp', 'image/tiff', 'image/svg+xml', 'image/x-icon', 'image/heic', 'image/heif',
-    // Audio
-    'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/m4a', 'audio/aac', 
-    'audio/flac', 'audio/x-ms-wma', 'audio/aiff',
-    // Vidéo
-    'video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv', 
-    'video/x-flv', 'video/webm', 'video/x-matroska', 'video/x-m4v',
-    // Documents
-    'application/pdf', 'application/msword', 
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain', 'application/rtf', 'application/vnd.oasis.opendocument.text',
-    'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    // Archives
-    'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed',
-    'application/x-tar', 'application/gzip'
-  ];
+  const allowedMimeTypesByExtension = {
+    '.jpg': ['image/jpeg'],
+    '.jpeg': ['image/jpeg'],
+    '.png': ['image/png'],
+    '.gif': ['image/gif'],
+    '.webp': ['image/webp'],
+    '.mp3': ['audio/mpeg'],
+    '.wav': ['audio/wav', 'audio/x-wav'],
+    '.ogg': ['audio/ogg', 'application/ogg'],
+    '.m4a': ['audio/mp4', 'audio/x-m4a'],
+    '.aac': ['audio/aac', 'audio/aacp'],
+    '.flac': ['audio/flac', 'audio/x-flac'],
+    '.mp4': ['video/mp4'],
+    '.mov': ['video/quicktime'],
+    '.webm': ['video/webm']
+  };
 
-  const mimetypeAllowed = allowedMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('image/') || file.mimetype.startsWith('audio/') || file.mimetype.startsWith('video/');
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedMimeTypes = allowedMimeTypesByExtension[ext];
 
-  if (mimetypeAllowed && extname) {
+  if (allowedMimeTypes?.includes(file.mimetype)) {
     return cb(null, true);
-  } else {
-    cb(new Error(`Format de fichier non autorisé. Types acceptés: Images, Audio, Vidéo, Documents, Archives`));
   }
+
+  cb(new Error('Format de fichier non autorisé. Types acceptés: jpg, jpeg, png, gif, webp, mp3, wav, ogg, m4a, aac, flac, mp4, mov, webm.'));
 };
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 200 * 1024 * 1024, // 200MB limit
+    fileSize: maxFileSize,
     files: 10 // Maximum 10 fichiers
   },
   fileFilter: fileFilter
@@ -372,20 +361,14 @@ function formatFileSize(bytes) {
 function getFileType(filename) {
   const ext = path.extname(filename).toLowerCase();
   
-  if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif', '.svg', '.ico', '.heic', '.heif'].includes(ext)) {
+  if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext)) {
     return 'image';
   }
-  if (['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.wma', '.aiff'].includes(ext)) {
+  if (['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac'].includes(ext)) {
     return 'audio';
   }
-  if (['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv', '.m4v'].includes(ext)) {
+  if (['.mp4', '.mov', '.webm'].includes(ext)) {
     return 'video';
-  }
-  if (['.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt', '.xls', '.xlsx', '.ppt', '.pptx'].includes(ext)) {
-    return 'document';
-  }
-  if (['.zip', '.rar', '.7z', '.tar', '.gz'].includes(ext)) {
-    return 'archive';
   }
   return 'other';
 }
@@ -398,7 +381,7 @@ router.use((error, req, res, next) => {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({ 
         success: false,
-        message: 'Fichier trop volumineux. Taille maximale autorisée: 200MB.' 
+        message: `Fichier trop volumineux. Taille maximale autorisée: ${formatFileSize(maxFileSize)}.` 
       });
     }
     if (error.code === 'LIMIT_FILE_COUNT') {

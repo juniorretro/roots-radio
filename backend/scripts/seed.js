@@ -8,10 +8,21 @@ const Program = require('../models/Program');
 const Episode = require('../models/Episode');
 const Podcast = require('../models/Podcast');
 
+const SEED_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
+const SEED_EDITOR_PASSWORD = process.env.SEED_EDITOR_PASSWORD;
+const SEED_USER_PASSWORD = process.env.SEED_USER_PASSWORD;
+const SEED_DB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+const requireStrongPassword = (value, name) => {
+  if (!value || value.length < 8 || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+    throw new Error(`${name} est requis et doit contenir au moins 8 caracteres, une majuscule, une minuscule et un chiffre.`);
+  }
+};
+
 // Connexion à MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(SEED_DB_URI);
     console.log('Connected to MongoDB for seeding');
   } catch (error) {
     console.error('MongoDB connection error:', error);
@@ -25,19 +36,19 @@ const seedData = {
     {
       name: 'Administrateur',
       email: 'roots@radio.com',
-      password: 'admin123',
+      password: SEED_ADMIN_PASSWORD,
       role: 'admin'
     },
     {
       name: 'Éditeur Test',
       email: 'editor@rootsmusicradio.com',
-      password: 'editor123',
+      password: SEED_EDITOR_PASSWORD,
       role: 'editor'
     },
     {
       name: 'Utilisateur Test',
       email: 'user@example.com',
-      password: 'user123',
+      password: SEED_USER_PASSWORD,
       role: 'user'
     }
   ],
@@ -234,6 +245,16 @@ const createPodcasts = async () => {
 const seedDatabase = async () => {
   try {
     console.log('Starting database seeding...');
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Refus de lancer le seed en production.');
+    }
+
+    requireStrongPassword(SEED_ADMIN_PASSWORD, 'SEED_ADMIN_PASSWORD');
+    requireStrongPassword(SEED_EDITOR_PASSWORD, 'SEED_EDITOR_PASSWORD');
+    requireStrongPassword(SEED_USER_PASSWORD, 'SEED_USER_PASSWORD');
+    if (!SEED_DB_URI) {
+      throw new Error('MONGODB_URI ou MONGO_URI est requis.');
+    }
     
     await connectDB();
     
@@ -248,9 +269,9 @@ const seedDatabase = async () => {
     
     console.log('Database seeding completed successfully!');
     console.log('\nTest accounts:');
-    console.log('Admin: admin@rootsmusicradio.com / admin123');
-    console.log('Editor: editor@rootsmusicradio.com / editor123');
-    console.log('User: user@example.com / user123');
+    console.log('Admin: roots@radio.com / défini via SEED_ADMIN_PASSWORD');
+    console.log('Editor: editor@rootsmusicradio.com / défini via SEED_EDITOR_PASSWORD');
+    console.log('User: user@example.com / défini via SEED_USER_PASSWORD');
     
   } catch (error) {
     console.error('Seeding failed:', error);

@@ -306,8 +306,8 @@ function App() {
                 <Route path="/programs" element={<Programs />} />
                 {/* <Route path="/admin/history" element={<ProtectedRoute adminOnly><AdminHistory /></ProtectedRoute>} /> */}
                 <Route path="/admin/combined-history" element={<ProtectedRoute adminOnly><AdminCombinedHistory /></ProtectedRoute>} />
-                <Route path="/admin/affiches" element={<AdminAffiches />} />
-                <Route path="/admin/emissions" element={<AdminEmissions />} />
+                <Route path="/admin/affiches" element={<ProtectedRoute adminOnly={true}><AdminAffiches /></ProtectedRoute>} />
+                <Route path="/admin/emissions" element={<ProtectedRoute adminOnly={true}><AdminEmissions /></ProtectedRoute>} />
 
                 <Route path="/programs/:slug" element={<ProgramDetail />} />
                 <Route path="/emissions" element={<Emissions />} />

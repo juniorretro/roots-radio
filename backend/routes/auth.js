@@ -176,6 +176,12 @@ const { body, validationResult } = require('express-validator');
 const { User } = require('../models');
 const { auth } = require('../middleware/auth');
 
+const passwordPolicy = (field) =>
+  body(field)
+    .isLength({ min: 8 }).withMessage('Le mot de passe doit contenir au moins 8 caractères')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage('Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre');
+
 // ─────────────────────────────────────────
 // POST /api/auth/register
 // ─────────────────────────────────────────
@@ -184,8 +190,7 @@ router.post('/register', [
   body('lastName').trim().isLength({ min: 2 }).withMessage('Le nom doit contenir au moins 2 caractères'),
   body('email')
     .isEmail().withMessage('Veuillez entrer un email valide'),
-  body('password')
-    .isLength({ min: 6 }).withMessage('Le mot de passe doit contenir au moins 6 caractères'),
+  passwordPolicy('password'),
   body('phone').optional().matches(/^\+?[\d\s-()+]+$/).withMessage('Format de téléphone invalide')
 ], async (req, res) => {
   try {
@@ -390,7 +395,7 @@ router.put('/profile', auth, [
 // ─────────────────────────────────────────
 router.put('/change-password', auth, [
   body('currentPassword').notEmpty().withMessage('Mot de passe actuel requis'),
-  body('newPassword').isLength({ min: 6 }).withMessage('Le nouveau mot de passe doit contenir au moins 6 caractères')
+  passwordPolicy('newPassword')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);

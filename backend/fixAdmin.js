@@ -7,7 +7,7 @@
  * 1. Détecte la bonne variable d'env MongoDB (MONGODB_URI ou MONGO_URI)
  * 2. Liste tous les users existants
  * 3. Supprime l'admin cassé s'il existe
- * 4. Recrée l'admin correctement avec roots@radio.com / admin123
+ * 4. Recrée l'admin correctement avec ADMIN_EMAIL et ADMIN_PASSWORD
  */
 
 require('dotenv').config();
@@ -17,10 +17,14 @@ const bcrypt = require('bcryptjs');
 // ─── 1. Gérer MONGODB_URI ou MONGO_URI (les deux noms sont utilisés dans ton projet) ───
 const MONGO_URI =
   process.env.MONGODB_URI ||   // ← seed.js doc2 utilise celui-ci
-  process.env.MONGO_URI ||     // ← verifyLogin.js utilise celui-ci
-  'mongodb://localhost:27017/radio';
+  process.env.MONGO_URI;       // ← verifyLogin.js utilise celui-ci
 
-console.log(`🔌 Connexion à: ${MONGO_URI}`);
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI ou MONGODB_URI est requis.');
+  process.exit(1);
+}
+
+console.log('🔌 Connexion à MongoDB...');
 
 // ─── 2. Schema complet identique à models/User.js ───
 const userSchema = new mongoose.Schema({
@@ -57,8 +61,13 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 // ─── Identifiants cibles ───
-const ADMIN_EMAIL    = 'roots@radio.com';
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL || 'roots@radio.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 8 || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(ADMIN_PASSWORD)) {
+  console.error('❌ ADMIN_PASSWORD est requis et doit contenir au moins 8 caracteres, une majuscule, une minuscule et un chiffre.');
+  process.exit(1);
+}
 
 async function main() {
   await mongoose.connect(MONGO_URI);
@@ -82,19 +91,18 @@ async function main() {
     if (existing.password && existing.password.startsWith('$2')) {
       const match = await bcrypt.compare(ADMIN_PASSWORD, existing.password);
       if (match) {
-        console.log(`✅ Mot de passe "${ADMIN_PASSWORD}" : CORRECT`);
+        console.log('✅ Mot de passe fourni : CORRECT');
         console.log(`✅ Role: ${existing.role}`);
         console.log(`✅ isActive: ${existing.isActive}`);
 
         if (existing.role === 'admin' && existing.isActive !== false) {
-          console.log('\n🎉 L\'admin est déjà correct ! Teste la connexion avec :');
+          console.log('\n🎉 L\'admin est déjà correct.');
           console.log(`   Email    : ${ADMIN_EMAIL}`);
-          console.log(`   Password : ${ADMIN_PASSWORD}`);
           await mongoose.disconnect();
           return;
         }
       } else {
-        console.log(`❌ Mot de passe "${ADMIN_PASSWORD}" : NE CORRESPOND PAS`);
+        console.log('❌ Mot de passe fourni : NE CORRESPOND PAS');
         console.log('   → On va réinitialiser le mot de passe et le rôle');
       }
     } else {
@@ -145,7 +153,7 @@ async function main() {
   console.log('\n══════════════════════════════════');
   console.log('🔐 IDENTIFIANTS ADMIN :');
   console.log(`   Email    : ${ADMIN_EMAIL}`);
-  console.log(`   Password : ${ADMIN_PASSWORD}`);
+  console.log('   Password : défini via ADMIN_PASSWORD');
   console.log('══════════════════════════════════');
 
   // ── Vérification finale ──

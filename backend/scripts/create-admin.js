@@ -3,7 +3,7 @@
  * 
  * Usage : node scripts/createAdmin.js
  * 
- * Crée l'utilisateur admin roots@radio.com / admin123
+ * Crée ou met à jour un administrateur avec ADMIN_EMAIL et ADMIN_PASSWORD.
  * Si l'admin existe déjà, met à jour son mot de passe et son rôle.
  */
 
@@ -12,7 +12,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 // ─── Connexion MongoDB ───
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/roots-radio';
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI ou MONGODB_URI est requis.');
+  process.exit(1);
+}
+
+const requireStrongPassword = (value, name) => {
+  if (!value || value.length < 8 || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+    console.error(`❌ ${name} est requis et doit contenir au moins 8 caracteres, une majuscule, une minuscule et un chiffre.`);
+    process.exit(1);
+  }
+};
 
 // ─── Schéma User minimal (identique à ton modèle) ───
 // On l'importe directement si possible, sinon on le redéfinit
@@ -39,12 +50,14 @@ try {
 }
 
 // ─── Données admin par défaut ───
+requireStrongPassword(process.env.ADMIN_PASSWORD, 'ADMIN_PASSWORD');
+
 const ADMIN_DATA = {
-  email:     'roots@radio.com',
-  password:  'admin123',
-  firstName: 'Admin',
-  lastName:  'Roots',
-  username:  'admin',
+  email:     process.env.ADMIN_EMAIL || 'roots@radio.com',
+  password:  process.env.ADMIN_PASSWORD,
+  firstName: process.env.ADMIN_FIRST_NAME || 'Admin',
+  lastName:  process.env.ADMIN_LAST_NAME || 'Roots',
+  username:  process.env.ADMIN_USERNAME || 'admin',
   role:      'admin',
   isActive:  true
 };
@@ -75,7 +88,6 @@ async function createAdmin() {
       console.log('');
       console.log('🔄 Admin mis à jour :');
       console.log(`   Email    : ${ADMIN_DATA.email}`);
-      console.log(`   Password : ${ADMIN_DATA.password}`);
       console.log(`   Rôle     : admin`);
       console.log('');
     } else {
@@ -104,7 +116,6 @@ async function createAdmin() {
       console.log('');
       console.log('✅ Admin créé avec succès !');
       console.log(`   Email    : ${ADMIN_DATA.email}`);
-      console.log(`   Password : ${ADMIN_DATA.password}`);
       console.log(`   Username : ${username}`);
       console.log(`   Rôle     : admin`);
       console.log('');

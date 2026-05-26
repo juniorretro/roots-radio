@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git -C \"c:/Users/AFROBIT/Documents/roots-radio\" ls-files --stage)",
+      "Bash(rm -rf \"c:/Users/AFROBIT/Documents/roots-radio/frontend/.git\" && echo \"DONE\")",
+      "Bash(git push *)",
+      "Bash(git fetch *)",
+      "Bash(git commit -m ' *)",
+      "Bash(MONGO_URI=\"mongodb+srv://rootsradio:rolande12@roots.o6oolch.mongodb.net/radio?appName=roots\" node scripts/update-admin-prod.js)",
+      "Bash(git check-ignore *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\AFROBIT\\Documents\\roots-radio\\frontend\\.git"
+    ]
+  }
+}

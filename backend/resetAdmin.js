@@ -52,6 +52,27 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@radio.com';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const CREATE_TEST_USER = process.env.CREATE_TEST_USER === 'true';
+const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD;
+
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI ou MONGODB_URI est requis.');
+  process.exit(1);
+}
+
+if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 8 || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(ADMIN_PASSWORD)) {
+  console.error('❌ ADMIN_PASSWORD est requis et doit contenir au moins 8 caracteres, une majuscule, une minuscule et un chiffre.');
+  process.exit(1);
+}
+
+if (CREATE_TEST_USER && (!TEST_USER_PASSWORD || TEST_USER_PASSWORD.length < 8)) {
+  console.error('❌ TEST_USER_PASSWORD est requis quand CREATE_TEST_USER=true.');
+  process.exit(1);
+}
 
 const resetAdmin = async () => {
   console.log('\n╔════════════════════════════════════════╗');
@@ -59,11 +80,9 @@ const resetAdmin = async () => {
   console.log('╚════════════════════════════════════════╝\n');
 
   try {
-    const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/radio';
     console.log('🔌 Connexion à MongoDB...');
-    console.log(`   URI: ${mongoUri}\n`);
     
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(MONGO_URI);
     console.log('✅ Connecté à MongoDB\n');
 
     // 1. Supprimer tous les anciens admins
@@ -72,7 +91,8 @@ const resetAdmin = async () => {
       $or: [
         { email: 'admin@radio.com' },
         { email: 'admin@rootsmusicradio.com' },
-        { username: 'admin' }
+        { email: ADMIN_EMAIL },
+        { username: ADMIN_USERNAME }
       ]
     });
     console.log(`   ${deleteResult.deletedCount} ancien(s) admin(s) supprimé(s)\n`);
@@ -81,13 +101,13 @@ const resetAdmin = async () => {
     console.log('👤 Création du nouvel administrateur...');
     
     const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash('password123', salt);
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, salt);
 
     const admin = new User({
-      username: 'admin',
+      username: ADMIN_USERNAME,
       firstName: 'Admin',
       lastName: 'System',
-      email: 'admin@radio.com',
+      email: ADMIN_EMAIL,
       password: hashedPassword,
       role: 'admin',
       newsletter: false,
@@ -100,7 +120,7 @@ const resetAdmin = async () => {
 
     // 3. Vérification
     console.log('🔍 Vérification...');
-    const verifyAdmin = await User.findOne({ email: 'admin@radio.com' });
+    const verifyAdmin = await User.findOne({ email: ADMIN_EMAIL });
     
     if (verifyAdmin) {
       console.log('✅ Vérification réussie\n');
@@ -113,7 +133,7 @@ const resetAdmin = async () => {
 
       // 4. Test du mot de passe
       console.log('🔐 Test du mot de passe...');
-      const isPasswordValid = await bcrypt.compare('password123', verifyAdmin.password);
+      const isPasswordValid = await bcrypt.compare(ADMIN_PASSWORD, verifyAdmin.password);
       
       if (isPasswordValid) {
         console.log('✅ Mot de passe valide\n');
@@ -125,27 +145,29 @@ const resetAdmin = async () => {
     }
 
     // 5. Créer un utilisateur de test si nécessaire
-    console.log('👤 Vérification utilisateur de test...');
-    const testUser = await User.findOne({ email: 'user@radio.com' });
-    
-    if (!testUser) {
-      const testUserPassword = await bcrypt.hash('password123', salt);
-      const newTestUser = new User({
-        username: 'testuser',
-        firstName: 'Test',
-        lastName: 'User',
-        email: 'user@radio.com',
-        password: testUserPassword,
-        role: 'user',
-        newsletter: true,
-        isActive: true,
-        phone: '+237987654321'
-      });
-      
-      await newTestUser.save();
-      console.log('✅ Utilisateur de test créé\n');
-    } else {
-      console.log('ℹ️  Utilisateur de test existe déjà\n');
+    if (CREATE_TEST_USER) {
+      console.log('👤 Vérification utilisateur de test...');
+      const testUser = await User.findOne({ email: 'user@radio.com' });
+
+      if (!testUser) {
+        const testUserPassword = await bcrypt.hash(TEST_USER_PASSWORD, salt);
+        const newTestUser = new User({
+          username: 'testuser',
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'user@radio.com',
+          password: testUserPassword,
+          role: 'user',
+          newsletter: true,
+          isActive: true,
+          phone: '+237987654321'
+        });
+
+        await newTestUser.save();
+        console.log('✅ Utilisateur de test créé\n');
+      } else {
+        console.log('ℹ️  Utilisateur de test existe déjà\n');
+      }
     }
 
     // 6. Statistiques finales
@@ -173,10 +195,12 @@ const resetAdmin = async () => {
     
     console.log('🎉 SUCCÈS ! Vous pouvez maintenant vous connecter\n');
     console.log('📝 IDENTIFIANTS :');
-    console.log('   Admin Email    : admin@radio.com');
-    console.log('   Admin Password : password123');
-    console.log('   User Email     : user@radio.com');
-    console.log('   User Password  : password123\n');
+    console.log(`   Admin Email    : ${ADMIN_EMAIL}`);
+    console.log('   Admin Password : défini via ADMIN_PASSWORD');
+    if (CREATE_TEST_USER) {
+      console.log('   User Email     : user@radio.com');
+      console.log('   User Password  : défini via TEST_USER_PASSWORD\n');
+    }
     
     console.log('🌐 URL de connexion :');
     console.log('   http://localhost:3000/login\n');

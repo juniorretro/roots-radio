@@ -5,7 +5,23 @@ require('dotenv').config();
 
 const { User, Program, Episode, Podcast } = require('../models');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/radio';
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'roots@radio.com';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const CREATE_TEST_USERS = process.env.CREATE_TEST_USERS === 'true';
+const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD;
+
+const requireStrongPassword = (value, name) => {
+  if (!value || value.length < 8 || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+    throw new Error(`${name} est requis et doit contenir au moins 8 caracteres, une majuscule, une minuscule et un chiffre.`);
+  }
+};
+
+if (!MONGODB_URI) {
+  console.error('❌ MONGODB_URI ou MONGO_URI est requis.');
+  process.exit(1);
+}
 
 // Données enrichies pour les programmes
 const samplePrograms = [
@@ -178,30 +194,39 @@ const connectDB = async () => {
 const createUsers = async () => {
   try {
     console.log('👥 Creating users...');
+    requireStrongPassword(ADMIN_PASSWORD, 'ADMIN_PASSWORD');
+    if (CREATE_TEST_USERS) {
+      requireStrongPassword(TEST_USER_PASSWORD, 'TEST_USER_PASSWORD');
+    }
     
     // Vérifier si l'admin existe déjà
-    let adminUser = await User.findOne({ email: 'roots@radio.com' });
+    let adminUser = await User.findOne({ email: ADMIN_EMAIL });
     if (!adminUser) {
       const salt = await bcrypt.genSalt(12);
-      const hashedPassword = await bcrypt.hash('admin123', salt);
+      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, salt);
       
       adminUser = new User({
-        username: 'admin',
+        username: ADMIN_USERNAME,
         firstName: 'Admin',
         lastName: 'Système',
-        email: 'roots@radio.com',
+        email: ADMIN_EMAIL,
         password: hashedPassword,
         role: 'admin',
         newsletter: false
       });
       
       await adminUser.save();
-      console.log('  ✅ Admin user created (email: roots@radio.com, password: admin123)');
+      console.log(`  ✅ Admin user created (email: ${ADMIN_EMAIL})`);
     } else {
       console.log('  ℹ️  Admin user already exists');
     }
 
     // Créer des utilisateurs de test s'ils n'existent pas
+    if (!CREATE_TEST_USERS) {
+      console.log('  ℹ️  Test users skipped (set CREATE_TEST_USERS=true to create them)');
+      return adminUser;
+    }
+
     const testUsers = [
       {
         username: 'mariedubois',
@@ -232,7 +257,7 @@ const createUsers = async () => {
     for (const userData of testUsers) {
       const existingUser = await User.findOne({ email: userData.email });
       if (!existingUser) {
-        const hashedPassword = await bcrypt.hash('password123', salt);
+        const hashedPassword = await bcrypt.hash(TEST_USER_PASSWORD, salt);
         const user = new User({
           ...userData,
           password: hashedPassword
@@ -467,9 +492,11 @@ const initializeDatabase = async () => {
       console.log(`👥 Utilisateurs: ${stats.users}`);
     }
     console.log('================================');
-    console.log('🔐 IDENTIFIANTS DE CONNEXION:');
-    console.log('Admin: roots@radio.com / admin123');
-    console.log('User: user@radio.com / password123');
+    console.log('🔐 Connexion admin:');
+    console.log(`Admin: ${ADMIN_EMAIL} / mot de passe défini via ADMIN_PASSWORD`);
+    if (CREATE_TEST_USERS) {
+      console.log('Utilisateurs test: mot de passe défini via TEST_USER_PASSWORD');
+    }
     console.log('================================');
     
   } catch (error) {
