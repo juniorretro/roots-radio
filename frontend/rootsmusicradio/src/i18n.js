@@ -9,7 +9,9 @@ const resources = {
       home: 'Home',
       programs: 'Programs',
       episodes: 'Episodes',
+      emissions: 'Broadcasts',
       podcasts: 'Podcasts',
+      favorites: 'Favorites',
       about: 'About',
       contact: 'Contact',
       login: 'Login',
@@ -92,7 +94,9 @@ const resources = {
       home: 'Accueil',
       programs: 'Programmes',
       episodes: 'Épisodes',
+      emissions: 'Émissions',
       podcasts: 'Podcasts',
+      favorites: 'Favoris',
       about: 'À Propos',
       contact: 'Contact',
       login: 'Connexion',
@@ -176,8 +180,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'fr', // Default language
-    fallbackLng: 'en',
+    fallbackLng: 'fr',
     interpolation: {
       escapeValue: false,
     },

@@ -269,7 +269,7 @@ const Navigation = () => {
               
               <LinkContainer to="/favorites">
                 <Nav.Link onClick={() => setExpanded(false)}>
-                  <i className="bi bi-heart me-1" />Favoris
+                  <i className="bi bi-heart me-1" />{t('favorites')}
                 </Nav.Link>
               </LinkContainer>
 
@@ -312,7 +312,7 @@ const Navigation = () => {
                 style={{ background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 20, padding: '7px 14px', cursor: 'pointer', fontSize: 14, color: dark ? '#f0f0f0' : '#000', marginRight: 4, display: 'flex', alignItems: 'center', gap: 6 }}
               >
                 <i className="bi bi-search" />
-                <span className="d-none d-lg-inline" style={{ fontSize: 13, fontWeight: 500 }}>Rechercher</span>
+                <span className="d-none d-lg-inline" style={{ fontSize: 13, fontWeight: 500 }}>{t('search')}</span>
               </button>
 
               {/* Dark mode toggle */}
