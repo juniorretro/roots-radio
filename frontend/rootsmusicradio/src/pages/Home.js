@@ -137,14 +137,14 @@ const Home = () => {
 
   const formatTime = (d) => {
     const date = new Date(d), diff = Math.floor((new Date() - date) / 60000);
-    if (diff < 1) return 'À l\'instant';
-    if (diff < 60) return `Il y a ${diff} min`;
+    if (diff < 1) return t('justNow');
+    if (diff < 60) return t('minutesAgo', { count: diff });
     return `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
   };
 
   const HistoryItem = ({ item }) => (
     <div className="d-flex align-items-center p-2 p-md-3 mb-2" style={{ background: item._isCurrentlyPlaying ? 'rgba(0,0,0,0.06)' : 'transparent', borderRadius: 12, borderLeft: item._isCurrentlyPlaying ? '3px solid #000' : '3px solid transparent', position: 'relative', transition: 'all 0.3s' }}>
-      {item._isCurrentlyPlaying && <span style={{ position: 'absolute', top: 8, right: 8, background: '#000', color: '#fff', fontSize: 9, padding: '2px 7px', borderRadius: 10, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', animation: 'blink 1.5s infinite' }}>● EN COURS</span>}
+      {item._isCurrentlyPlaying && <span style={{ position: 'absolute', top: 8, right: 8, background: '#000', color: '#fff', fontSize: 9, padding: '2px 7px', borderRadius: 10, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', animation: 'blink 1.5s infinite' }}>● {t('nowPlayingLabel')}</span>}
       <img src={item.cover || '/images/default-cover.png'} alt={item.title} style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', marginRight: 12, flexShrink: 0 }} onError={e => { e.target.src = '/images/default-cover.png'; }} />
       <div className="flex-grow-1 overflow-hidden">
         <div style={{ fontSize: 13, fontWeight: item._isCurrentlyPlaying ? 600 : 500, color: '#1a1a1a' }} className="text-truncate">{item.title}</div>
@@ -172,7 +172,7 @@ const Home = () => {
         <section style={{ padding: '40px 0 0', background: '#fff' }}>
           <Container className="px-3 px-md-4">
             <div className="mb-4">
-              <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 300, color: '#000', fontFamily: 'Cormorant Garamond, serif', letterSpacing: '-0.02em', marginBottom: 6 }}>Actualités & Événements</h2>
+              <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 300, color: '#000', fontFamily: 'Cormorant Garamond, serif', letterSpacing: '-0.02em', marginBottom: 6 }}>{t('newsEvents')}</h2>
               <div style={{ width: 40, height: 2, background: '#000' }} />
             </div>
 
@@ -184,12 +184,12 @@ const Home = () => {
                     <img src={resolveImg(affiche.image)} alt={affiche.title} style={{ width: '100%', minHeight: 'clamp(220px, 40vw, 420px)', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { e.target.style.display = 'none'; }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 55%, transparent 100%)' }} />
                     <div style={{ position: 'absolute', bottom: 0, left: 0, padding: 'clamp(20px, 4vw, 52px)', zIndex: 2, maxWidth: '60%' }}>
-                      <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 8, fontWeight: 500 }}>Actualité</p>
+                      <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 8, fontWeight: 500 }}>{t('news')}</p>
                       <h3 style={{ color: '#fff', fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.3rem, 3.5vw, 2.8rem)', fontWeight: 600, marginBottom: 10, lineHeight: 1.2 }}>{affiche.title}</h3>
                       {affiche.subtitle && <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'clamp(12px, 1.4vw, 15px)', marginBottom: 24, lineHeight: 1.7 }}>{affiche.subtitle}</p>}
                       {affiche.link && (
                         <a href={affiche.link} target={affiche.link.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff', color: '#000', padding: '10px 22px', borderRadius: 30, fontWeight: 600, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                          {affiche.linkText || 'En savoir plus'} <i className="bi bi-arrow-right" />
+                          {affiche.linkText || t('learnMore')} <i className="bi bi-arrow-right" />
                         </a>
                       )}
                     </div>
@@ -252,10 +252,10 @@ const Home = () => {
             <Col lg={5}>
               <div style={{ background: '#fff', borderRadius: 24, minHeight: 400, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', padding: '20px 16px' }}>
                 <div className="d-flex align-items-center justify-content-between mb-3">
-                  <h4 style={{ fontSize: 18, fontWeight: 600, color: '#000', margin: 0 }}>Historique</h4>
+                  <h4 style={{ fontSize: 18, fontWeight: 600, color: '#000', margin: 0 }}>{t('history')}</h4>
                   <div className="d-flex align-items-center gap-2">
                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block', animation: 'pulse 1.5s infinite', flexShrink: 0 }} />
-                    <span style={{ background: 'rgba(0,0,0,0.05)', color: '#000', fontWeight: 500, padding: '4px 10px', borderRadius: 20, fontSize: 11 }}>{combinedHistory.length} TITRES</span>
+                    <span style={{ background: 'rgba(0,0,0,0.05)', color: '#000', fontWeight: 500, padding: '4px 10px', borderRadius: 20, fontSize: 11 }}>{combinedHistory.length} {t('tracks')}</span>
                   </div>
                 </div>
                 <div className="history-container" style={{ maxHeight: 340, overflowY: 'auto' }}>
@@ -263,7 +263,7 @@ const Home = () => {
                     <div className="text-center py-4"><div className="spinner-border spinner-border-sm" role="status" /></div>
                   ) : combinedHistory.length === 0 ? (
                     <div className="text-center py-4" style={{ color: '#999', fontSize: 14 }}>
-                      <i className="bi bi-music-note-beamed d-block mb-2" style={{ fontSize: 28 }} />Aucun historique
+                      <i className="bi bi-music-note-beamed d-block mb-2" style={{ fontSize: 28 }} />{t('noHistory')}
                     </div>
                   ) : combinedHistory.slice(0, 20).map((item, index) => <HistoryItem key={item._id || index} item={item} />)}
                 </div>
@@ -278,7 +278,7 @@ const Home = () => {
         <section style={{ padding: '60px 0', background: '#fafafa' }}>
           <Container>
             <div className="text-center mb-4 mb-md-5">
-              <h2 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', fontWeight: 300, color: '#000', fontFamily: 'Cormorant Garamond, serif', letterSpacing: '-0.02em', marginBottom: 12 }}>Programmes à la une</h2>
+              <h2 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', fontWeight: 300, color: '#000', fontFamily: 'Cormorant Garamond, serif', letterSpacing: '-0.02em', marginBottom: 12 }}>{t('featuredPrograms')}</h2>
               <div style={{ width: 50, height: 2, background: '#000', margin: '0 auto' }} />
             </div>
             <Row className="g-3 g-md-4">
@@ -287,7 +287,7 @@ const Home = () => {
                   <Card className="h-100 border-0 hover-card" style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
                     <div style={{ position: 'relative', overflow: 'hidden' }}>
                       <Card.Img variant="top" src={program.image || '/uploads/placeholder-program.jpg'} alt={program.title} style={{ height: 240, objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>À LA UNE</div>
+                      <div style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>{t('featuredBadge')}</div>
                     </div>
                     <Card.Body className="p-3 p-md-4 d-flex flex-column">
                       <h5 style={{ fontWeight: 600, color: '#000', marginBottom: 8, fontSize: 18 }}>{program.title}</h5>
@@ -297,7 +297,7 @@ const Home = () => {
                         <Badge style={{ background: 'rgba(0,0,0,0.06)', color: '#000', padding: '6px 12px', borderRadius: 20 }}>{program.category}</Badge>
                         <div className="d-flex align-items-center gap-2">
                           <FavoriteBtn item={{ id: program._id, type: 'program', title: program.title, subtitle: program.host, image: program.image, slug: program.slug }} size="sm" />
-                          <Link to={`/programs/${program.slug}`} className="btn btn-sm" style={{ background: '#000', color: '#fff', border: 'none', borderRadius: 20, padding: '6px 18px', fontSize: 12, fontWeight: 500 }}>Découvrir</Link>
+                          <Link to={`/programs/${program.slug}`} className="btn btn-sm" style={{ background: '#000', color: '#fff', border: 'none', borderRadius: 20, padding: '6px 18px', fontSize: 12, fontWeight: 500 }}>{t('discover')}</Link>
                         </div>
                       </div>
                     </Card.Body>
@@ -306,7 +306,7 @@ const Home = () => {
               ))}
             </Row>
             <div className="text-center mt-4">
-              <Link to="/programs" style={{ display: 'inline-block', border: '1.5px solid #000', color: '#000', padding: '10px 28px', borderRadius: 30, fontSize: 13, fontWeight: 500, textTransform: 'uppercase', textDecoration: 'none', letterSpacing: '0.5px' }}>Tous les programmes</Link>
+              <Link to="/programs" style={{ display: 'inline-block', border: '1.5px solid #000', color: '#000', padding: '10px 28px', borderRadius: 30, fontSize: 13, fontWeight: 500, textTransform: 'uppercase', textDecoration: 'none', letterSpacing: '0.5px' }}>{t('allPrograms')}</Link>
             </div>
           </Container>
         </section>
@@ -317,11 +317,11 @@ const Home = () => {
         <Container>
           <Row>
             <Col lg={8} className="mx-auto text-center">
-              <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3.5rem)', fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', letterSpacing: '-0.03em', marginBottom: 20 }}>Rejoignez notre univers sonore</h2>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.8, maxWidth: 580, margin: '0 auto 40px' }}>Découvrez nos programmes live, nos épisodes exclusifs et notre collection de podcasts.</p>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 3.5rem)', fontWeight: 300, fontFamily: 'Cormorant Garamond, serif', letterSpacing: '-0.03em', marginBottom: 20 }}>{t('joinOurWorld')}</h2>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.8, maxWidth: 580, margin: '0 auto 40px' }}>{t('joinOurWorldDesc')}</p>
               <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                <Link to="/programs" style={{ display: 'inline-block', background: '#fff', color: '#000', padding: '13px 32px', borderRadius: 30, fontWeight: 500, fontSize: 13, textTransform: 'uppercase', textDecoration: 'none', letterSpacing: '0.5px' }}><i className="bi bi-calendar3 me-2" />Voir la programmation</Link>
-                <Link to="/about" style={{ display: 'inline-block', background: 'transparent', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff', padding: '13px 32px', borderRadius: 30, fontWeight: 500, fontSize: 13, textTransform: 'uppercase', textDecoration: 'none', letterSpacing: '0.5px' }}><i className="bi bi-info-circle me-2" />À propos</Link>
+                <Link to="/programs" style={{ display: 'inline-block', background: '#fff', color: '#000', padding: '13px 32px', borderRadius: 30, fontWeight: 500, fontSize: 13, textTransform: 'uppercase', textDecoration: 'none', letterSpacing: '0.5px' }}><i className="bi bi-calendar3 me-2" />{t('viewSchedule')}</Link>
+                <Link to="/about" style={{ display: 'inline-block', background: 'transparent', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff', padding: '13px 32px', borderRadius: 30, fontWeight: 500, fontSize: 13, textTransform: 'uppercase', textDecoration: 'none', letterSpacing: '0.5px' }}><i className="bi bi-info-circle me-2" />{t('about')}</Link>
               </div>
             </Col>
           </Row>
@@ -332,7 +332,7 @@ const Home = () => {
       <section style={{ padding: 'clamp(40px, 6vw, 80px) 0', background: '#fff' }}>
         <Container>
           <Row className="g-4 text-center">
-            {[{ value: '24/7', label: 'Diffusion continue' }, { value: nowPlaying?.listeners > 0 ? nowPlaying.listeners.toLocaleString() : '—', label: 'Auditeurs en direct' }, { value: '1000+', label: 'Épisodes' }, { value: `${playHistory.length}+`, label: 'Titres joués' }].map((stat, i) => (
+            {[{ value: '24/7', label: t('continuousBroadcast') }, { value: nowPlaying?.listeners > 0 ? nowPlaying.listeners.toLocaleString() : '—', label: t('liveListeners') }, { value: '1000+', label: t('episodes') }, { value: `${playHistory.length}+`, label: t('tracksPlayed') }].map((stat, i) => (
               <Col xs={6} md={3} key={i}>
                 <h3 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 300, color: '#000', fontFamily: 'Cormorant Garamond, serif', marginBottom: 8 }}>{stat.value}</h3>
                 <p style={{ color: '#666', fontSize: 12, letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: 500 }}>{stat.label}</p>

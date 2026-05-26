@@ -59,11 +59,11 @@ const Login = () => {
           navigate(from, { replace: true });
         }
       } else {
-        setError(result.message || 'Échec de la connexion');
+        setError(result.message || t('loginFailed'));
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('Une erreur est survenue lors de la connexion');
+      setError(t('loginError'));
     }
     
     setLoading(false);
@@ -77,7 +77,7 @@ const Login = () => {
           <div className="spinner-border text-primary mb-3" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="text-muted">Chargement...</p>
+          <p className="text-muted">{t('loading')}</p>
         </div>
       </div>
     );
@@ -94,7 +94,7 @@ const Login = () => {
                   <i className="bi bi-radio fs-1 text-primary mb-3"></i>
                   <h2 className="mb-2">{t('login')}</h2>
                   <p className="text-muted">
-                    Connectez-vous à votre compte Radio Stream
+                    {t('loginSubtitle')}
                   </p>
                 </div>
 
@@ -134,7 +134,7 @@ const Login = () => {
                       onChange={handleChange}
                       required
                       className="form-control-custom"
-                      placeholder="Votre mot de passe"
+                      placeholder={t('passwordPlaceholder')}
                     />
                   </Form.Group>
 
@@ -148,7 +148,7 @@ const Login = () => {
                     {loading ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Connexion en cours...
+                        {t('loggingIn')}
                       </>
                     ) : (
                       <>
@@ -162,7 +162,7 @@ const Login = () => {
                 <hr className="my-4" />
 
                 <div className="text-center">
-                  <p className="mb-2">Vous n'avez pas encore de compte ?</p>
+                  <p className="mb-2">{t('noAccount')}</p>
                   <Link to="/register" className="btn btn-outline-dark-custom">
                     <i className="bi bi-person-plus me-2"></i>
                     {t('register')}

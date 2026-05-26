@@ -1,9 +1,3 @@
-// src/pages/Contact.js
-// ✅ Corrections:
-//   - Import depuis ../services/api (plus de simulation)
-//   - handleSubmit envoie vraiment les données à POST /api/contact
-//   - http:// → https:// pour WhatsApp et liens
-
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
@@ -24,12 +18,12 @@ const Contact = () => {
   const [alertMessage, setAlertMessage] = useState('');
 
   const contactTypes = [
-    { value: 'general',     label: 'Question générale' },
-    { value: 'program',     label: 'Proposition de programme' },
-    { value: 'technical',   label: 'Support technique' },
-    { value: 'partnership', label: 'Partenariat' },
-    { value: 'press',       label: 'Presse' },
-    { value: 'other',       label: 'Autre' },
+    { value: 'general',     label: t('contactTypeGeneral') },
+    { value: 'program',     label: t('contactTypeProgram') },
+    { value: 'technical',   label: t('contactTypeTechnical') },
+    { value: 'partnership', label: t('contactTypePartnership') },
+    { value: 'press',       label: t('contactTypePress') },
+    { value: 'other',       label: t('contactTypeOther') },
   ];
 
   const handleChange = (e) => {
@@ -37,14 +31,12 @@ const Contact = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Vrai appel API — plus de setTimeout
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation basique côté client
     if (formData.message.trim().length < 10) {
       setAlertType('warning');
-      setAlertMessage('Votre message doit contenir au moins 10 caractères.');
+      setAlertMessage(t('msgTooShort'));
       setShowAlert(true);
       return;
     }
@@ -62,15 +54,13 @@ const Contact = () => {
       });
 
       setAlertType('success');
-      setAlertMessage('Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+      setAlertMessage(t('msgSent'));
       setShowAlert(true);
-
-      // Réinitialiser le formulaire
       setFormData({ name: '', email: '', subject: '', message: '', type: 'general' });
     } catch (error) {
       const serverMsg = error.response?.data?.message;
       setAlertType('danger');
-      setAlertMessage(serverMsg || "Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+      setAlertMessage(serverMsg || t('msgError'));
       setShowAlert(true);
     } finally {
       setIsSubmitting(false);
@@ -80,28 +70,23 @@ const Contact = () => {
   return (
     <div className="contact-page py-5">
       <Container>
-        {/* Header */}
         <Row className="mb-5">
           <Col>
             <h1 className="text-center mb-3">
               <i className="bi bi-envelope me-2"></i>
-              Contactez-nous
+              {t('contactTitle')}
             </h1>
-            <p className="text-center text-muted lead">
-              Une question, une suggestion ou envie de rejoindre notre équipe ?
-              Nous sommes à votre écoute !
-            </p>
+            <p className="text-center text-muted lead">{t('contactSubtitle')}</p>
           </Col>
         </Row>
 
         <Row>
-          {/* Formulaire de contact */}
           <Col lg={8} className="mb-5">
             <Card className="shadow-sm">
               <Card.Header className="bg-primary text-white">
                 <h4 className="mb-0">
                   <i className="bi bi-chat-dots me-2"></i>
-                  Envoyez-nous un message
+                  {t('sendMessage')}
                 </h4>
               </Card.Header>
               <Card.Body>
@@ -117,11 +102,11 @@ const Contact = () => {
                       <Form.Group>
                         <Form.Label>
                           <i className="bi bi-person me-1"></i>
-                          Nom complet *
+                          {t('fullName')} *
                         </Form.Label>
                         <Form.Control
                           type="text" name="name" value={formData.name}
-                          onChange={handleChange} required placeholder="Votre nom et prénom"
+                          onChange={handleChange} required placeholder={t('fullNamePlaceholder')}
                         />
                       </Form.Group>
                     </Col>
@@ -129,7 +114,7 @@ const Contact = () => {
                       <Form.Group>
                         <Form.Label>
                           <i className="bi bi-envelope me-1"></i>
-                          Email *
+                          {t('email')} *
                         </Form.Label>
                         <Form.Control
                           type="email" name="email" value={formData.email}
@@ -144,7 +129,7 @@ const Contact = () => {
                       <Form.Group>
                         <Form.Label>
                           <i className="bi bi-tag me-1"></i>
-                          Type de demande
+                          {t('requestType')}
                         </Form.Label>
                         <Form.Select name="type" value={formData.type} onChange={handleChange}>
                           {contactTypes.map(ct => (
@@ -157,11 +142,11 @@ const Contact = () => {
                       <Form.Group>
                         <Form.Label>
                           <i className="bi bi-chat-square-text me-1"></i>
-                          Sujet *
+                          {t('subject')} *
                         </Form.Label>
                         <Form.Control
                           type="text" name="subject" value={formData.subject}
-                          onChange={handleChange} required placeholder="Objet de votre message"
+                          onChange={handleChange} required placeholder={t('subjectPlaceholder')}
                         />
                       </Form.Group>
                     </Col>
@@ -170,15 +155,15 @@ const Contact = () => {
                   <Form.Group className="mb-4">
                     <Form.Label>
                       <i className="bi bi-chat-left-text me-1"></i>
-                      Message *
+                      {t('message')} *
                     </Form.Label>
                     <Form.Control
                       as="textarea" rows={6} name="message" value={formData.message}
-                      onChange={handleChange} required placeholder="Votre message détaillé..."
+                      onChange={handleChange} required placeholder={t('messagePlaceholder')}
                       minLength={10} maxLength={1000}
                     />
                     <Form.Text className="text-muted">
-                      {formData.message.length}/1000 caractères (minimum 10)
+                      {t('charCount', { count: formData.message.length })}
                     </Form.Text>
                   </Form.Group>
 
@@ -187,12 +172,12 @@ const Contact = () => {
                       {isSubmitting ? (
                         <>
                           <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                          Envoi en cours...
+                          {t('sending')}
                         </>
                       ) : (
                         <>
                           <i className="bi bi-send me-2"></i>
-                          Envoyer le message
+                          {t('sendMessageBtn')}
                         </>
                       )}
                     </Button>
@@ -202,19 +187,18 @@ const Contact = () => {
             </Card>
           </Col>
 
-          {/* Infos de contact */}
           <Col lg={4}>
             <Card className="shadow-sm mb-4">
               <Card.Header className="bg-dark text-white">
                 <h5 className="mb-0">
                   <i className="bi bi-info-circle me-2"></i>
-                  Informations de contact
+                  {t('contactInfo')}
                 </h5>
               </Card.Header>
               <Card.Body>
                 <div className="mb-3">
                   <h6 className="mb-2">
-                    <i className="bi bi-geo-alt-fill text-danger me-2"></i>Adresse
+                    <i className="bi bi-geo-alt-fill text-danger me-2"></i>{t('address')}
                   </h6>
                   <p className="text-muted mb-0">
                     123 Avenue de la Radio<br />Yaoundé, Cameroun<br />BP 1234
@@ -222,7 +206,7 @@ const Contact = () => {
                 </div>
                 <div className="mb-3">
                   <h6 className="mb-2">
-                    <i className="bi bi-telephone-fill text-success me-2"></i>Téléphone
+                    <i className="bi bi-telephone-fill text-success me-2"></i>{t('phone')}
                   </h6>
                   <p className="text-muted mb-0">
                     <a href="tel:+237691239717" className="text-decoration-none">+237 691 239 717</a>
@@ -230,7 +214,7 @@ const Contact = () => {
                 </div>
                 <div className="mb-3">
                   <h6 className="mb-2">
-                    <i className="bi bi-envelope-fill text-primary me-2"></i>Email
+                    <i className="bi bi-envelope-fill text-primary me-2"></i>{t('email')}
                   </h6>
                   <p className="text-muted mb-0">
                     <a href="mailto:rootsradiofm105@gmail.com" className="text-decoration-none">
@@ -240,11 +224,11 @@ const Contact = () => {
                 </div>
                 <div className="mb-3">
                   <h6 className="mb-2">
-                    <i className="bi bi-clock-fill text-warning me-2"></i>Horaires
+                    <i className="bi bi-clock-fill text-warning me-2"></i>{t('hours')}
                   </h6>
-                  <p className="text-muted mb-1">Lundi - Vendredi : 9h - 18h</p>
-                  <p className="text-muted mb-0">Samedi : 10h - 16h</p>
-                  <p className="text-muted mb-0">Dimanche : Fermé</p>
+                  <p className="text-muted mb-1">{t('hoursWeekdays')}</p>
+                  <p className="text-muted mb-0">{t('hoursSaturday')}</p>
+                  <p className="text-muted mb-0">{t('hoursSunday')}</p>
                 </div>
               </Card.Body>
             </Card>
@@ -252,7 +236,7 @@ const Contact = () => {
             <Card className="shadow-sm mb-4">
               <Card.Header className="bg-info text-white">
                 <h5 className="mb-0">
-                  <i className="bi bi-share me-2"></i>Réseaux sociaux
+                  <i className="bi bi-share me-2"></i>{t('socialNetworks')}
                 </h5>
               </Card.Header>
               <Card.Body>
@@ -266,7 +250,6 @@ const Contact = () => {
                   <a href="https://www.instagram.com/roots_radiofm105.9" target="_blank" rel="noopener noreferrer" className="btn btn-outline-danger">
                     <i className="bi bi-instagram me-2"></i>Instagram
                   </a>
-                  {/* ✅ https:// au lieu de http:// */}
                   <a href="https://wa.me/237691239717" target="_blank" rel="noopener noreferrer" className="btn btn-outline-success">
                     <i className="bi bi-whatsapp me-2"></i>WhatsApp
                   </a>
@@ -277,16 +260,15 @@ const Contact = () => {
             <Card className="shadow-sm">
               <Card.Header className="bg-success text-white">
                 <h5 className="mb-0">
-                  <i className="bi bi-lightning-fill me-2"></i>Contact rapide
+                  <i className="bi bi-lightning-fill me-2"></i>{t('quickContact')}
                 </h5>
               </Card.Header>
               <Card.Body>
-                <p className="text-muted mb-3">Besoin d'une réponse urgente ?</p>
+                <p className="text-muted mb-3">{t('urgentContact')}</p>
                 <div className="d-grid gap-2">
                   <a href="tel:+237691239717" className="btn btn-success">
-                    <i className="bi bi-telephone-fill me-2"></i>Appeler maintenant
+                    <i className="bi bi-telephone-fill me-2"></i>{t('callNow')}
                   </a>
-                  {/* ✅ https:// */}
                   <a href="https://wa.me/237691239717" target="_blank" rel="noopener noreferrer" className="btn btn-outline-success">
                     <i className="bi bi-whatsapp me-2"></i>WhatsApp
                   </a>
@@ -294,53 +276,41 @@ const Contact = () => {
                 <hr />
                 <small className="text-muted">
                   <i className="bi bi-info-circle me-1"></i>
-                  Réponse sous 24h en moyenne
+                  {t('responseTime')}
                 </small>
               </Card.Body>
             </Card>
           </Col>
         </Row>
 
-        {/* FAQ */}
         <Row className="mt-5">
           <Col>
             <Card className="shadow-sm">
               <Card.Header className="bg-warning text-dark">
                 <h4 className="mb-0">
-                  <i className="bi bi-question-circle me-2"></i>Questions fréquentes
+                  <i className="bi bi-question-circle me-2"></i>{t('faq')}
                 </h4>
               </Card.Header>
               <Card.Body>
                 <Row>
                   <Col md={6}>
                     <div className="mb-3">
-                      <h6>Comment puis-je proposer un programme ?</h6>
-                      <p className="text-muted small">
-                        Utilisez le formulaire ci-dessus en sélectionnant "Proposition de programme"
-                        et décrivez votre concept en détail.
-                      </p>
+                      <h6>{t('faqQ1')}</h6>
+                      <p className="text-muted small">{t('faqA1')}</p>
                     </div>
                     <div className="mb-3">
-                      <h6>Puis-je faire de la publicité sur votre station ?</h6>
-                      <p className="text-muted small">
-                        Oui ! Contactez-nous en sélectionnant "Partenariat" pour discuter
-                        des opportunités publicitaires.
-                      </p>
+                      <h6>{t('faqQ2')}</h6>
+                      <p className="text-muted small">{t('faqA2')}</p>
                     </div>
                   </Col>
                   <Col md={6}>
                     <div className="mb-3">
-                      <h6>Comment résoudre les problèmes techniques ?</h6>
-                      <p className="text-muted small">
-                        Sélectionnez "Support technique" et décrivez précisément le problème rencontré.
-                      </p>
+                      <h6>{t('faqQ3')}</h6>
+                      <p className="text-muted small">{t('faqA3')}</p>
                     </div>
                     <div className="mb-3">
-                      <h6>Recrute-vous de nouveaux talents ?</h6>
-                      <p className="text-muted small">
-                        Nous sommes toujours intéressés par de nouveaux talents !
-                        Envoyez-nous votre candidature avec vos démos.
-                      </p>
+                      <h6>{t('faqQ4')}</h6>
+                      <p className="text-muted small">{t('faqA4')}</p>
                     </div>
                   </Col>
                 </Row>

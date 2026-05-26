@@ -18,14 +18,14 @@ const Programs = () => {
   const [categories, setCategories] = useState(['all']);
 
   const days = [
-    { key: 'all', label: 'Tous les jours' },
-    { key: 'monday', label: 'Lundi' },
-    { key: 'tuesday', label: 'Mardi' },
-    { key: 'wednesday', label: 'Mercredi' },
-    { key: 'thursday', label: 'Jeudi' },
-    { key: 'friday', label: 'Vendredi' },
-    { key: 'saturday', label: 'Samedi' },
-    { key: 'sunday', label: 'Dimanche' }
+    { key: 'all',       label: t('allDays') },
+    { key: 'monday',    label: t('monday') },
+    { key: 'tuesday',   label: t('tuesday') },
+    { key: 'wednesday', label: t('wednesday') },
+    { key: 'thursday',  label: t('thursday') },
+    { key: 'friday',    label: t('friday') },
+    { key: 'saturday',  label: t('saturday') },
+    { key: 'sunday',    label: t('sunday') },
   ];
 
   // ✅ Récupération dynamique des programmes
@@ -51,7 +51,7 @@ const Programs = () => {
         
       } catch (error) {
         console.error('Failed to fetch programs:', error);
-        setError('Erreur lors du chargement des programmes');
+        setError(t('programsError'));
         setPrograms([]);
       } finally {
         setLoading(false);
@@ -227,7 +227,7 @@ const Programs = () => {
                 marginBottom: '16px'
               }}
             >
-              {program.description || 'Aucune description disponible'}
+              {program.description || t('noDescription')}
             </Card.Text>
             
             {/* Horaires */}
@@ -266,7 +266,7 @@ const Programs = () => {
               ) : (
                 <div style={{ fontSize: '12px', color: '#666' }}>
                   <i className="bi bi-calendar3 me-2"></i>
-                  {programDays.length > 0 ? programDays.join(', ') : 'Horaires non définis'}
+                  {programDays.length > 0 ? programDays.join(', ') : t('noSchedule')}
                 </div>
               )}
             </div>
@@ -313,7 +313,7 @@ const Programs = () => {
               }}
             >
               <i className="bi bi-eye me-2"></i>
-              Voir les détails
+              {t('seeDetails')}
             </Link>
           </Card.Body>
         </Card>
@@ -328,7 +328,7 @@ const Programs = () => {
         <Container style={{ paddingTop: '60px' }}>
           <div className="text-center py-5">
             <Spinner animation="border" variant="dark" />
-            <p className="mt-3">Chargement des programmes...</p>
+            <p className="mt-3">{t('loadingPrograms')}</p>
           </div>
         </Container>
       </div>
@@ -341,10 +341,10 @@ const Programs = () => {
       <div style={{ background: '#fafafa', minHeight: '100vh', paddingBottom: '80px' }}>
         <Container style={{ paddingTop: '60px' }}>
           <Alert variant="danger" className="mt-5">
-            <Alert.Heading>Erreur</Alert.Heading>
+            <Alert.Heading>{t('error')}</Alert.Heading>
             <p>{error}</p>
             <Button variant="outline-danger" onClick={() => window.location.reload()}>
-              Réessayer
+              {t('retry')}
             </Button>
           </Alert>
         </Container>
@@ -363,7 +363,7 @@ const Programs = () => {
       <Container style={{ paddingTop: '60px' }}>
         {/* Header */}
         <div className="text-center mb-5">
-          <h1 
+          <h1
             style={{
               fontSize: '4rem',
               fontWeight: '600',
@@ -373,9 +373,9 @@ const Programs = () => {
               marginBottom: '16px'
             }}
           >
-            Nos Programmes
+            {t('programsTitle')}
           </h1>
-          <p 
+          <p
             style={{
               fontSize: '16px',
               color: '#666',
@@ -384,8 +384,7 @@ const Programs = () => {
               lineHeight: '1.6'
             }}
           >
-            Découvrez notre grille complète de programmes. 
-            Du lundi au dimanche, profitez de contenus variés pour tous les goûts.
+            {t('programsSubtitle')}
           </p>
           <div 
             style={{
@@ -418,7 +417,7 @@ const Programs = () => {
                 letterSpacing: '0.5px'
               }}
             >
-              Filtrer par jour
+              {t('filterByDay')}
             </h6>
             <Nav variant="pills" className="flex-wrap">
               {days.map((day) => (
@@ -457,7 +456,7 @@ const Programs = () => {
                 letterSpacing: '0.5px'
               }}
             >
-              Filtrer par catégorie
+              {t('filterByCategory')}
             </h6>
             <div className="d-flex flex-wrap gap-2">
               {categories.map((category) => (
@@ -474,7 +473,7 @@ const Programs = () => {
                     border: selectedCategory === category ? 'none' : '1.5px solid rgba(0,0,0,0.12)'
                   }}
                 >
-                  {category === 'all' ? 'Toutes les catégories' : category}
+                  {category === 'all' ? t('allCategories') : category}
                 </Button>
               ))}
             </div>
@@ -491,8 +490,8 @@ const Programs = () => {
                 color: '#1a1a1a'
               }}
             >
-              {filteredPrograms.length} programme{filteredPrograms.length > 1 ? 's' : ''} 
-              {selectedDay !== 'all' && ` pour ${days.find(d => d.key === selectedDay)?.label}`}
+              {filteredPrograms.length} {filteredPrograms.length > 1 ? t('programs') : t('programs').replace(/s$/, '') }
+              {selectedDay !== 'all' && ` — ${days.find(d => d.key === selectedDay)?.label}`}
             </h5>
           </Col>
         </Row>
@@ -521,25 +520,17 @@ const Programs = () => {
                   }}
                 ></i>
                 <h4 style={{ color: '#999', marginBottom: '16px' }}>
-                  Aucun programme trouvé
+                  {t('noProgramsFound')}
                 </h4>
                 <p style={{ color: '#999', marginBottom: '24px' }}>
-                  {programs.length === 0 
-                    ? 'Aucun programme disponible pour le moment.' 
-                    : 'Aucun programme ne correspond à vos critères de recherche.'}
+                  {programs.length === 0 ? t('noProgramsAvailable') : t('noProgramsFilter')}
                 </p>
-                <Button 
+                <Button
                   variant="dark"
-                  onClick={() => {
-                    setSelectedDay('all');
-                    setSelectedCategory('all');
-                  }}
-                  style={{
-                    borderRadius: '20px',
-                    padding: '10px 24px'
-                  }}
+                  onClick={() => { setSelectedDay('all'); setSelectedCategory('all'); }}
+                  style={{ borderRadius: '20px', padding: '10px 24px' }}
                 >
-                  Réinitialiser les filtres
+                  {t('resetFilters')}
                 </Button>
               </div>
             </Col>
@@ -561,7 +552,7 @@ const Programs = () => {
               >
                 <Row className="align-items-center">
                   <Col md={8}>
-                    <h4 
+                    <h4
                       style={{
                         fontSize: '28px',
                         fontWeight: '600',
@@ -569,11 +560,10 @@ const Programs = () => {
                         fontFamily: 'Cormorant Garamond, serif'
                       }}
                     >
-                      Une question sur nos programmes ?
+                      {t('programsQuestion')}
                     </h4>
                     <p style={{ marginBottom: 0, opacity: 0.9 }}>
-                      Contactez-nous pour toute information complémentaire sur notre grille 
-                      de programmes ou pour proposer de nouvelles émissions.
+                      {t('programsQuestionDesc')}
                     </p>
                   </Col>
                   <Col md={4} className="text-md-end mt-3 mt-md-0">
@@ -588,7 +578,7 @@ const Programs = () => {
                       }}
                     >
                       <i className="bi bi-envelope me-2"></i>
-                      Nous contacter
+                      {t('contactUs')}
                     </Link>
                   </Col>
                 </Row>

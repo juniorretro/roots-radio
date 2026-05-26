@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      // Navigation
+      // ── Navigation ──────────────────────────────────────────────────
       home: 'Home',
       programs: 'Programs',
       episodes: 'Episodes',
@@ -18,62 +18,183 @@ const resources = {
       register: 'Register',
       logout: 'Logout',
       admin: 'Admin',
-      
-      // Audio Player
-      play: 'Play',
-      pause: 'Pause',
-      volume: 'Volume',
-      liveStream: 'Live Stream',
-      nowPlaying: 'Now Playing',
-      
-      // Programs
-      currentProgram: 'Current Program',
-      nextProgram: 'Next Program',
-      schedule: 'Schedule',
-      host: 'Host',
-      category: 'Category',
-      duration: 'Duration',
-      
-      // Episodes
-      episode: 'Episode',
-      season: 'Season',
-      airDate: 'Air Date',
-      
-      // Podcasts
-      podcast: 'Podcast',
-      download: 'Download',
-      like: 'Like',
-      publishDate: 'Publish Date',
-      
-      // Common
       search: 'Search',
-      filter: 'Filter',
-      featured: 'Featured',
-      all: 'All',
-      title: 'Title',
-      description: 'Description',
+
+      // ── Common ──────────────────────────────────────────────────────
       loading: 'Loading...',
+      error: 'Error',
+      retry: 'Retry',
       noResults: 'No results found',
-      
-      // Forms
-      email: 'Email',
-      password: 'Password',
-      username: 'Username',
-      submit: 'Submit',
+      discover: 'Discover',
+      seeDetails: 'See Details',
+      allPrograms: 'All Programs',
+      noDescription: 'No description available',
+      min: 'min',
+      featured: 'Featured',
+      featuredBadge: 'FEATURED',
+      contactUs: 'Contact Us',
+      send: 'Send',
       cancel: 'Cancel',
       save: 'Save',
       delete: 'Delete',
       edit: 'Edit',
       create: 'Create',
-      
-      // Admin
-      dashboard: 'Dashboard',
-      stats: 'Statistics',
-      manage: 'Manage',
-      total: 'Total',
-      active: 'Active',
-      
-      // Days
+      see: 'See',
+
+      // ── Time ────────────────────────────────────────────────────────
+      justNow: 'Just now',
+      minutesAgo: '{{count}} min ago',
+      nowPlayingLabel: 'PLAYING',
+
+      // ── Home ────────────────────────────────────────────────────────
+      newsEvents: 'News & Events',
+      news: 'News',
+      learnMore: 'Learn more',
+      history: 'History',
+      tracks: 'TRACKS',
+      noHistory: 'No history',
+      featuredPrograms: 'Featured Programs',
+      joinOurWorld: 'Join Our Sound Universe',
+      joinOurWorldDesc: 'Discover our live programs, exclusive episodes and our podcast collection.',
+      viewSchedule: 'View Schedule',
+      continuousBroadcast: 'Continuous Broadcast',
+      liveListeners: 'Live Listeners',
+      tracksPlayed: 'Tracks Played',
+
+      // ── Programs ────────────────────────────────────────────────────
+      programsTitle: 'Our Programs',
+      programsSubtitle: 'Discover our full schedule. Monday to Sunday, enjoy varied content for all tastes.',
+      filterByDay: 'Filter by day',
+      filterByCategory: 'Filter by category',
+      allDays: 'All days',
+      allCategories: 'All categories',
+      noProgramsFound: 'No programs found',
+      noProgramsAvailable: 'No programs available at the moment.',
+      noProgramsFilter: 'No programs match your search criteria.',
+      resetFilters: 'Reset Filters',
+      noSchedule: 'Schedule not defined',
+      loadingPrograms: 'Loading programs...',
+      programsError: 'Error loading programs',
+      programsQuestion: 'A question about our programs?',
+      programsQuestionDesc: 'Contact us for any additional information about our schedule or to propose new shows.',
+
+      // ── About ───────────────────────────────────────────────────────
+      aboutTitle: 'About Us',
+      aboutDescription: 'ROOTS RADIO Where Everything Starts is the leading music radio station in Cameroon for urban music. Broadcasting from Cameroon, specifically in Yaoundé, Douala and Kribi on FM frequency 105.9. If you love music that hits hard, you will definitely love listening to Roots Radio Cameroon wherever you are. This radio offers a high-quality selection of the best artists and sounds of all genres including Afro, Afro-fusion, Hip-hop, Reggae, Rap and Pop. ROOTS RADIO Cameroon lets you enjoy the best music with varied pleasures. It is completely free and available from any internet-connected device.',
+      contactUsBtn: 'Contact Us',
+
+      // ── Contact ─────────────────────────────────────────────────────
+      contactTitle: 'Contact Us',
+      contactSubtitle: 'A question, a suggestion or want to join our team? We are here for you!',
+      sendMessage: 'Send Us a Message',
+      fullName: 'Full Name',
+      fullNamePlaceholder: 'Your full name',
+      requestType: 'Request Type',
+      subject: 'Subject',
+      subjectPlaceholder: 'Subject of your message',
+      message: 'Message',
+      messagePlaceholder: 'Your detailed message...',
+      charCount: '{{count}}/1000 characters (minimum 10)',
+      sending: 'Sending...',
+      sendMessageBtn: 'Send Message',
+      contactInfo: 'Contact Information',
+      address: 'Address',
+      phone: 'Phone',
+      hours: 'Hours',
+      hoursWeekdays: 'Monday - Friday: 9am - 6pm',
+      hoursSaturday: 'Saturday: 10am - 4pm',
+      hoursSunday: 'Sunday: Closed',
+      socialNetworks: 'Social Networks',
+      quickContact: 'Quick Contact',
+      urgentContact: 'Need an urgent response?',
+      callNow: 'Call Now',
+      responseTime: 'Average response within 24 hours',
+      faq: 'Frequently Asked Questions',
+      faqQ1: 'How can I propose a program?',
+      faqA1: 'Use the form above by selecting "Program Proposal" and describe your concept in detail.',
+      faqQ2: 'Can I advertise on your station?',
+      faqA2: 'Yes! Contact us by selecting "Partnership" to discuss advertising opportunities.',
+      faqQ3: 'How to resolve technical issues?',
+      faqA3: 'Select "Technical Support" and describe the problem you encountered precisely.',
+      faqQ4: 'Are you recruiting new talent?',
+      faqA4: 'We are always interested in new talent! Send us your application with your demos.',
+      contactTypeGeneral: 'General Question',
+      contactTypeProgram: 'Program Proposal',
+      contactTypeTechnical: 'Technical Support',
+      contactTypePartnership: 'Partnership',
+      contactTypePress: 'Press',
+      contactTypeOther: 'Other',
+      msgTooShort: 'Your message must be at least 10 characters.',
+      msgSent: 'Your message was sent successfully! We will get back to you as soon as possible.',
+      msgError: 'An error occurred while sending. Please try again.',
+
+      // ── Login ───────────────────────────────────────────────────────
+      loginSubtitle: 'Sign in to your Roots Radio account',
+      loggingIn: 'Signing in...',
+      passwordPlaceholder: 'Your password',
+      noAccount: "Don't have an account yet?",
+      loginFailed: 'Login failed',
+      loginError: 'An error occurred during login',
+
+      // ── Register ────────────────────────────────────────────────────
+      createAccount: 'Create Account',
+      registerSubtitle: 'Join the Roots Music Radio community',
+      firstName: 'First Name',
+      firstNamePlaceholder: 'Your first name',
+      lastName: 'Last Name',
+      lastNamePlaceholder: 'Your last name',
+      email: 'Email',
+      emailAddress: 'Email Address',
+      password: 'Password',
+      phoneOptional: 'Phone (optional)',
+      confirmPassword: 'Confirm Password',
+      confirmPasswordPlaceholder: 'Confirm your password',
+      passwordStrengthLabel: 'Password strength:',
+      pwWeak: 'Weak',
+      pwMedium: 'Medium',
+      pwGood: 'Good',
+      pwExcellent: 'Excellent',
+      newsletterLabel: 'I wish to receive the newsletter and station news',
+      termsAccept: 'I accept the',
+      termsLink: 'terms of use',
+      termsAnd: 'and the',
+      privacyLink: 'privacy policy',
+      creatingAccount: 'Creating account...',
+      createAccountBtn: 'Create My Account',
+      haveAccount: 'Already have an account?',
+      signIn: 'Sign In',
+      accountBenefitsTitle: 'Account Benefits',
+      benefitFavorites: 'Save your favorites',
+      benefitNotifications: 'Personalized notifications',
+      benefitDownloads: 'Exclusive downloads',
+      errFirstNameRequired: 'First name is required',
+      errFirstNameMin: 'First name must be at least 2 characters',
+      errLastNameRequired: 'Last name is required',
+      errLastNameMin: 'Last name must be at least 2 characters',
+      errEmailRequired: 'Email is required',
+      errEmailInvalid: 'Invalid email format',
+      errPasswordRequired: 'Password is required',
+      errPasswordMin: 'Password must be at least 8 characters',
+      errPasswordStrength: 'Password must contain at least one uppercase, one lowercase and one number',
+      errConfirmRequired: 'Password confirmation is required',
+      errPasswordMatch: 'Passwords do not match',
+      errPhoneInvalid: 'Invalid phone format',
+      errTerms: 'You must accept the terms of use',
+      errRegister: 'An error occurred while creating the account',
+
+      // ── Favorites ───────────────────────────────────────────────────
+      myFavorites: 'My Favorites',
+      clearAll: 'Clear All',
+      confirmClear: 'Clear all favorites?',
+      noFavoritesYet: 'No favorites yet',
+      noFavoritesDesc: 'Click the heart on a program or episode to save it here.',
+      savedOn: 'Saved on',
+      typeProgram: 'Program',
+      typeEpisode: 'Episode',
+      noFavPrograms: 'No programs in your favorites.',
+      noFavEpisodes: 'No episodes in your favorites.',
+
+      // ── Days ────────────────────────────────────────────────────────
       monday: 'Monday',
       tuesday: 'Tuesday',
       wednesday: 'Wednesday',
@@ -81,16 +202,30 @@ const resources = {
       friday: 'Friday',
       saturday: 'Saturday',
       sunday: 'Sunday',
-      
-      // Messages
-      welcome: 'Welcome to Radio Streaming',
+
+      // ── Audio / Radio ───────────────────────────────────────────────
+      play: 'Play',
+      pause: 'Pause',
+      volume: 'Volume',
+      liveStream: 'Live Stream',
+      nowPlaying: 'Now Playing',
+
+      // ── Admin ───────────────────────────────────────────────────────
+      dashboard: 'Dashboard',
+      stats: 'Statistics',
+      manage: 'Manage',
+      total: 'Total',
+      active: 'Active',
+
+      // ── Misc ────────────────────────────────────────────────────────
+      welcome: 'Welcome to Roots Radio',
       noCurrentProgram: 'No current program',
-      noNextProgram: 'No next program today'
+      noNextProgram: 'No next program today',
     }
   },
   fr: {
     translation: {
-      // Navigation
+      // ── Navigation ──────────────────────────────────────────────────
       home: 'Accueil',
       programs: 'Programmes',
       episodes: 'Épisodes',
@@ -103,62 +238,183 @@ const resources = {
       register: 'Inscription',
       logout: 'Déconnexion',
       admin: 'Admin',
-      
-      // Audio Player
-      play: 'Lecture',
-      pause: 'Pause',
-      volume: 'Volume',
-      liveStream: 'Stream en Direct',
-      nowPlaying: 'En Cours',
-      
-      // Programs
-      currentProgram: 'Programme Actuel',
-      nextProgram: 'Prochain Programme',
-      schedule: 'Grille',
-      host: 'Animateur',
-      category: 'Catégorie',
-      duration: 'Durée',
-      
-      // Episodes
-      episode: 'Épisode',
-      season: 'Saison',
-      airDate: 'Date de Diffusion',
-      
-      // Podcasts
-      podcast: 'Podcast',
-      download: 'Télécharger',
-      like: 'J\'aime',
-      publishDate: 'Date de Publication',
-      
-      // Common
       search: 'Rechercher',
-      filter: 'Filtrer',
-      featured: 'À la Une',
-      all: 'Tous',
-      title: 'Titre',
-      description: 'Description',
+
+      // ── Common ──────────────────────────────────────────────────────
       loading: 'Chargement...',
+      error: 'Erreur',
+      retry: 'Réessayer',
       noResults: 'Aucun résultat trouvé',
-      
-      // Forms
-      email: 'Email',
-      password: 'Mot de passe',
-      username: 'Nom d\'utilisateur',
-      submit: 'Envoyer',
+      discover: 'Découvrir',
+      seeDetails: 'Voir les détails',
+      allPrograms: 'Tous les programmes',
+      noDescription: 'Aucune description disponible',
+      min: 'min',
+      featured: 'À la Une',
+      featuredBadge: 'À LA UNE',
+      contactUs: 'Nous contacter',
+      send: 'Envoyer',
       cancel: 'Annuler',
       save: 'Enregistrer',
       delete: 'Supprimer',
       edit: 'Modifier',
       create: 'Créer',
-      
-      // Admin
-      dashboard: 'Tableau de Bord',
-      stats: 'Statistiques',
-      manage: 'Gérer',
-      total: 'Total',
-      active: 'Actif',
-      
-      // Days
+      see: 'Voir',
+
+      // ── Time ────────────────────────────────────────────────────────
+      justNow: 'À l\'instant',
+      minutesAgo: 'Il y a {{count}} min',
+      nowPlayingLabel: 'EN COURS',
+
+      // ── Home ────────────────────────────────────────────────────────
+      newsEvents: 'Actualités & Événements',
+      news: 'Actualité',
+      learnMore: 'En savoir plus',
+      history: 'Historique',
+      tracks: 'TITRES',
+      noHistory: 'Aucun historique',
+      featuredPrograms: 'Programmes à la une',
+      joinOurWorld: 'Rejoignez notre univers sonore',
+      joinOurWorldDesc: 'Découvrez nos programmes live, nos épisodes exclusifs et notre collection de podcasts.',
+      viewSchedule: 'Voir la programmation',
+      continuousBroadcast: 'Diffusion continue',
+      liveListeners: 'Auditeurs en direct',
+      tracksPlayed: 'Titres joués',
+
+      // ── Programs ────────────────────────────────────────────────────
+      programsTitle: 'Nos Programmes',
+      programsSubtitle: 'Découvrez notre grille complète de programmes. Du lundi au dimanche, profitez de contenus variés pour tous les goûts.',
+      filterByDay: 'Filtrer par jour',
+      filterByCategory: 'Filtrer par catégorie',
+      allDays: 'Tous les jours',
+      allCategories: 'Toutes les catégories',
+      noProgramsFound: 'Aucun programme trouvé',
+      noProgramsAvailable: 'Aucun programme disponible pour le moment.',
+      noProgramsFilter: 'Aucun programme ne correspond à vos critères de recherche.',
+      resetFilters: 'Réinitialiser les filtres',
+      noSchedule: 'Horaires non définis',
+      loadingPrograms: 'Chargement des programmes...',
+      programsError: 'Erreur lors du chargement des programmes',
+      programsQuestion: 'Une question sur nos programmes ?',
+      programsQuestionDesc: 'Contactez-nous pour toute information complémentaire sur notre grille de programmes ou pour proposer de nouvelles émissions.',
+
+      // ── About ───────────────────────────────────────────────────────
+      aboutTitle: 'À propos de Nous',
+      aboutDescription: 'ROOTS RADIO Where Everything Starts, c\'est la Station de radio musicale leader au Cameroun en terme de musique urbaine. Diffusant depuis le Cameroun, plus précisément dans les villes de Yaoundé, Douala et Kribi sur la frequence FM 105.9 . Si vous aimez la musique qui tape fort, alors vous allez sûrement adorer ecouter la radio en ligne Roots Radio Cameroun partout ou vous vous trouvez. Cette radio propose une sélection de haute qualité des meilleurs artistes et sons de toute catégorie mais pas seulement. Elle diffuse également des morceaux Afro, Afro-fusion, hip-hop, Reggae, Rap ainsi que la Pop. ROOTS RADIO Cameroun vous permet d\'apprécier le meilleur de la musique en faisant varier les plaisirs. Elle est entièrement gratuite et disponible depuis n\'importe quel appareil connecté à internet.',
+      contactUsBtn: 'Nous Contacter',
+
+      // ── Contact ─────────────────────────────────────────────────────
+      contactTitle: 'Contactez-nous',
+      contactSubtitle: 'Une question, une suggestion ou envie de rejoindre notre équipe ? Nous sommes à votre écoute !',
+      sendMessage: 'Envoyez-nous un message',
+      fullName: 'Nom complet',
+      fullNamePlaceholder: 'Votre nom et prénom',
+      requestType: 'Type de demande',
+      subject: 'Sujet',
+      subjectPlaceholder: 'Objet de votre message',
+      message: 'Message',
+      messagePlaceholder: 'Votre message détaillé...',
+      charCount: '{{count}}/1000 caractères (minimum 10)',
+      sending: 'Envoi en cours...',
+      sendMessageBtn: 'Envoyer le message',
+      contactInfo: 'Informations de contact',
+      address: 'Adresse',
+      phone: 'Téléphone',
+      hours: 'Horaires',
+      hoursWeekdays: 'Lundi - Vendredi : 9h - 18h',
+      hoursSaturday: 'Samedi : 10h - 16h',
+      hoursSunday: 'Dimanche : Fermé',
+      socialNetworks: 'Réseaux sociaux',
+      quickContact: 'Contact rapide',
+      urgentContact: 'Besoin d\'une réponse urgente ?',
+      callNow: 'Appeler maintenant',
+      responseTime: 'Réponse sous 24h en moyenne',
+      faq: 'Questions fréquentes',
+      faqQ1: 'Comment puis-je proposer un programme ?',
+      faqA1: 'Utilisez le formulaire ci-dessus en sélectionnant "Proposition de programme" et décrivez votre concept en détail.',
+      faqQ2: 'Puis-je faire de la publicité sur votre station ?',
+      faqA2: 'Oui ! Contactez-nous en sélectionnant "Partenariat" pour discuter des opportunités publicitaires.',
+      faqQ3: 'Comment résoudre les problèmes techniques ?',
+      faqA3: 'Sélectionnez "Support technique" et décrivez précisément le problème rencontré.',
+      faqQ4: 'Recrute-vous de nouveaux talents ?',
+      faqA4: 'Nous sommes toujours intéressés par de nouveaux talents ! Envoyez-nous votre candidature avec vos démos.',
+      contactTypeGeneral: 'Question générale',
+      contactTypeProgram: 'Proposition de programme',
+      contactTypeTechnical: 'Support technique',
+      contactTypePartnership: 'Partenariat',
+      contactTypePress: 'Presse',
+      contactTypeOther: 'Autre',
+      msgTooShort: 'Votre message doit contenir au moins 10 caractères.',
+      msgSent: 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.',
+      msgError: 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer.',
+
+      // ── Login ───────────────────────────────────────────────────────
+      loginSubtitle: 'Connectez-vous à votre compte Roots Radio',
+      loggingIn: 'Connexion en cours...',
+      passwordPlaceholder: 'Votre mot de passe',
+      noAccount: 'Vous n\'avez pas encore de compte ?',
+      loginFailed: 'Échec de la connexion',
+      loginError: 'Une erreur est survenue lors de la connexion',
+
+      // ── Register ────────────────────────────────────────────────────
+      createAccount: 'Créer un compte',
+      registerSubtitle: 'Rejoignez la communauté Roots Music Radio',
+      firstName: 'Prénom',
+      firstNamePlaceholder: 'Votre prénom',
+      lastName: 'Nom',
+      lastNamePlaceholder: 'Votre nom',
+      email: 'Email',
+      emailAddress: 'Adresse email',
+      password: 'Mot de passe',
+      phoneOptional: 'Téléphone (optionnel)',
+      confirmPassword: 'Confirmer le mot de passe',
+      confirmPasswordPlaceholder: 'Confirmez votre mot de passe',
+      passwordStrengthLabel: 'Force du mot de passe :',
+      pwWeak: 'Faible',
+      pwMedium: 'Moyen',
+      pwGood: 'Bon',
+      pwExcellent: 'Excellent',
+      newsletterLabel: 'Je souhaite recevoir la newsletter et les actualités de la station',
+      termsAccept: 'J\'accepte les',
+      termsLink: 'conditions d\'utilisation',
+      termsAnd: 'et la',
+      privacyLink: 'politique de confidentialité',
+      creatingAccount: 'Création en cours...',
+      createAccountBtn: 'Créer mon compte',
+      haveAccount: 'Vous avez déjà un compte ?',
+      signIn: 'Se connecter',
+      accountBenefitsTitle: 'Avantages d\'un compte',
+      benefitFavorites: 'Sauvegardez vos favoris',
+      benefitNotifications: 'Notifications personnalisées',
+      benefitDownloads: 'Téléchargements exclusifs',
+      errFirstNameRequired: 'Le prénom est requis',
+      errFirstNameMin: 'Le prénom doit contenir au moins 2 caractères',
+      errLastNameRequired: 'Le nom est requis',
+      errLastNameMin: 'Le nom doit contenir au moins 2 caractères',
+      errEmailRequired: 'L\'email est requis',
+      errEmailInvalid: 'Format d\'email invalide',
+      errPasswordRequired: 'Le mot de passe est requis',
+      errPasswordMin: 'Le mot de passe doit contenir au moins 8 caractères',
+      errPasswordStrength: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre',
+      errConfirmRequired: 'La confirmation du mot de passe est requise',
+      errPasswordMatch: 'Les mots de passe ne correspondent pas',
+      errPhoneInvalid: 'Format de téléphone invalide',
+      errTerms: 'Vous devez accepter les conditions d\'utilisation',
+      errRegister: 'Une erreur est survenue lors de la création du compte',
+
+      // ── Favorites ───────────────────────────────────────────────────
+      myFavorites: 'Mes Favoris',
+      clearAll: 'Tout effacer',
+      confirmClear: 'Vider tous les favoris ?',
+      noFavoritesYet: 'Aucun favori pour l\'instant',
+      noFavoritesDesc: 'Cliquez sur le cœur sur un programme ou un épisode pour le sauvegarder ici.',
+      savedOn: 'Sauvegardé le',
+      typeProgram: 'Programme',
+      typeEpisode: 'Épisode',
+      noFavPrograms: 'Aucun programme dans vos favoris.',
+      noFavEpisodes: 'Aucun épisode dans vos favoris.',
+
+      // ── Days ────────────────────────────────────────────────────────
       monday: 'Lundi',
       tuesday: 'Mardi',
       wednesday: 'Mercredi',
@@ -166,11 +422,25 @@ const resources = {
       friday: 'Vendredi',
       saturday: 'Samedi',
       sunday: 'Dimanche',
-      
-      // Messages
-      welcome: 'Bienvenue sur Radio Streaming',
+
+      // ── Audio / Radio ───────────────────────────────────────────────
+      play: 'Lecture',
+      pause: 'Pause',
+      volume: 'Volume',
+      liveStream: 'Stream en Direct',
+      nowPlaying: 'En Cours',
+
+      // ── Admin ───────────────────────────────────────────────────────
+      dashboard: 'Tableau de Bord',
+      stats: 'Statistiques',
+      manage: 'Gérer',
+      total: 'Total',
+      active: 'Actif',
+
+      // ── Misc ────────────────────────────────────────────────────────
+      welcome: 'Bienvenue sur Roots Radio',
       noCurrentProgram: 'Aucun programme en cours',
-      noNextProgram: 'Aucun prochain programme aujourd\'hui'
+      noNextProgram: 'Aucun prochain programme aujourd\'hui',
     }
   }
 };

@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register } = useAuth();
   
@@ -43,52 +45,45 @@ const Register = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // First name validation
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'Le prénom est requis';
+      newErrors.firstName = t('errFirstNameRequired');
     } else if (formData.firstName.length < 2) {
-      newErrors.firstName = 'Le prénom doit contenir au moins 2 caractères';
+      newErrors.firstName = t('errFirstNameMin');
     }
 
-    // Last name validation
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Le nom est requis';
+      newErrors.lastName = t('errLastNameRequired');
     } else if (formData.lastName.length < 2) {
-      newErrors.lastName = 'Le nom doit contenir au moins 2 caractères';
+      newErrors.lastName = t('errLastNameMin');
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
-      newErrors.email = 'L\'email est requis';
+      newErrors.email = t('errEmailRequired');
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Format d\'email invalide';
+      newErrors.email = t('errEmailInvalid');
     }
 
-    // Password validation
     if (!formData.password) {
-      newErrors.password = 'Le mot de passe est requis';
+      newErrors.password = t('errPasswordRequired');
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Le mot de passe doit contenir au moins 8 caractères';
+      newErrors.password = t('errPasswordMin');
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre';
+      newErrors.password = t('errPasswordStrength');
     }
 
-    // Confirm password validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'La confirmation du mot de passe est requise';
+      newErrors.confirmPassword = t('errConfirmRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+      newErrors.confirmPassword = t('errPasswordMatch');
     }
 
-    // Phone validation (optional but if provided, must be valid)
     if (formData.phone && !/^\+?[\d\s-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Format de téléphone invalide';
+      newErrors.phone = t('errPhoneInvalid');
     }
 
-    // Terms acceptance
     if (!formData.acceptTerms) {
-      newErrors.acceptTerms = 'Vous devez accepter les conditions d\'utilisation';
+      newErrors.acceptTerms = t('errTerms');
     }
 
     return newErrors;
@@ -129,7 +124,7 @@ const Register = () => {
     } catch (error) {
       console.error('Registration error:', error);
       setErrors({
-        submit: error.message || 'Une erreur est survenue lors de la création du compte'
+        submit: error.message || t('errRegister')
       });
     } finally {
       setIsSubmitting(false);
@@ -144,10 +139,10 @@ const Register = () => {
     if (password.match(/[0-9]/)) score++;
     if (password.match(/[^A-Za-z0-9]/)) score++;
 
-    if (score < 2) return { label: 'Faible', color: 'danger', width: '25%' };
-    if (score < 4) return { label: 'Moyen', color: 'warning', width: '50%' };
-    if (score < 5) return { label: 'Bon', color: 'info', width: '75%' };
-    return { label: 'Excellent', color: 'success', width: '100%' };
+    if (score < 2) return { label: t('pwWeak'),      color: 'danger',  width: '25%' };
+    if (score < 4) return { label: t('pwMedium'),    color: 'warning', width: '50%' };
+    if (score < 5) return { label: t('pwGood'),      color: 'info',    width: '75%' };
+    return          { label: t('pwExcellent'), color: 'success', width: '100%' };
   };
 
   return (
@@ -159,10 +154,10 @@ const Register = () => {
               <Card.Header className="bg-primary text-white text-center py-4">
                 <h2 className="mb-0">
                   <i className="bi bi-person-plus-fill me-2"></i>
-                  Créer un compte
+                  {t('createAccount')}
                 </h2>
                 <p className="mb-0 mt-2 opacity-75">
-                  Rejoignez la communauté Roots Music Radio
+                  {t('registerSubtitle')}
                 </p>
               </Card.Header>
               
@@ -181,7 +176,7 @@ const Register = () => {
                       <Form.Group className="mb-3">
                         <Form.Label>
                           <i className="bi bi-person me-1"></i>
-                          Prénom *
+                          {t('firstName')} *
                         </Form.Label>
                         <Form.Control
                           type="text"
@@ -189,7 +184,7 @@ const Register = () => {
                           value={formData.firstName}
                           onChange={handleChange}
                           isInvalid={!!errors.firstName}
-                          placeholder="Votre prénom"
+                          placeholder={t('firstNamePlaceholder')}
                         />
                         <Form.Control.Feedback type="invalid">
                           {errors.firstName}
@@ -201,7 +196,7 @@ const Register = () => {
                       <Form.Group className="mb-3">
                         <Form.Label>
                           <i className="bi bi-person me-1"></i>
-                          Nom *
+                          {t('lastName')} *
                         </Form.Label>
                         <Form.Control
                           type="text"
@@ -209,7 +204,7 @@ const Register = () => {
                           value={formData.lastName}
                           onChange={handleChange}
                           isInvalid={!!errors.lastName}
-                          placeholder="Votre nom"
+                          placeholder={t('lastNamePlaceholder')}
                         />
                         <Form.Control.Feedback type="invalid">
                           {errors.lastName}
@@ -222,7 +217,7 @@ const Register = () => {
                   <Form.Group className="mb-3">
                     <Form.Label>
                       <i className="bi bi-envelope me-1"></i>
-                      Adresse email *
+                      {t('emailAddress')} *
                     </Form.Label>
                     <Form.Control
                       type="email"
@@ -241,7 +236,7 @@ const Register = () => {
                   <Form.Group className="mb-3">
                     <Form.Label>
                       <i className="bi bi-telephone me-1"></i>
-                      Téléphone (optionnel)
+                      {t('phoneOptional')}
                     </Form.Label>
                     <Form.Control
                       type="tel"
@@ -260,7 +255,7 @@ const Register = () => {
                   <Form.Group className="mb-3">
                     <Form.Label>
                       <i className="bi bi-lock me-1"></i>
-                      Mot de passe *
+                      {t('password')} *
                     </Form.Label>
                     <InputGroup>
                       <Form.Control
@@ -269,7 +264,7 @@ const Register = () => {
                         value={formData.password}
                         onChange={handleChange}
                         isInvalid={!!errors.password}
-                        placeholder="Votre mot de passe"
+                        placeholder={t('passwordPlaceholder')}
                       />
                       <Button
                         variant="outline-secondary"
@@ -283,7 +278,7 @@ const Register = () => {
                     {formData.password && (
                       <div className="mt-2">
                         <div className="d-flex justify-content-between align-items-center mb-1">
-                          <small>Force du mot de passe:</small>
+                          <small>{t('passwordStrengthLabel')}</small>
                           <small className={`text-${getPasswordStrength(formData.password).color}`}>
                             {getPasswordStrength(formData.password).label}
                           </small>
@@ -306,7 +301,7 @@ const Register = () => {
                   <Form.Group className="mb-3">
                     <Form.Label>
                       <i className="bi bi-lock-fill me-1"></i>
-                      Confirmer le mot de passe *
+                      {t('confirmPassword')} *
                     </Form.Label>
                     <InputGroup>
                       <Form.Control
@@ -315,7 +310,7 @@ const Register = () => {
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         isInvalid={!!errors.confirmPassword}
-                        placeholder="Confirmez votre mot de passe"
+                        placeholder={t('confirmPasswordPlaceholder')}
                       />
                       <Button
                         variant="outline-secondary"
@@ -340,7 +335,7 @@ const Register = () => {
                       label={
                         <>
                           <i className="bi bi-envelope-heart me-1"></i>
-                          Je souhaite recevoir la newsletter et les actualités de la station
+                          {t('newsletterLabel')}
                         </>
                       }
                     />
@@ -356,13 +351,13 @@ const Register = () => {
                       isInvalid={!!errors.acceptTerms}
                       label={
                         <>
-                          J'accepte les{' '}
+                          {t('termsAccept')}{' '}
                           <Link to="/terms" target="_blank" className="text-decoration-none">
-                            conditions d'utilisation
+                            {t('termsLink')}
                           </Link>
-                          {' '}et la{' '}
+                          {' '}{t('termsAnd')}{' '}
                           <Link to="/privacy" target="_blank" className="text-decoration-none">
-                            politique de confidentialité
+                            {t('privacyLink')}
                           </Link>
                           {' '}*
                         </>
@@ -384,12 +379,12 @@ const Register = () => {
                       {isSubmitting ? (
                         <>
                           <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                          Création en cours...
+                          {t('creatingAccount')}
                         </>
                       ) : (
                         <>
                           <i className="bi bi-person-plus me-2"></i>
-                          Créer mon compte
+                          {t('createAccountBtn')}
                         </>
                       )}
                     </Button>
@@ -398,9 +393,9 @@ const Register = () => {
                   {/* Login Link */}
                   <div className="text-center">
                     <p className="text-muted mb-0">
-                      Vous avez déjà un compte ?{' '}
+                      {t('haveAccount')}{' '}
                       <Link to="/login" className="text-decoration-none fw-bold">
-                        Se connecter
+                        {t('signIn')}
                       </Link>
                     </p>
                   </div>
@@ -413,25 +408,25 @@ const Register = () => {
               <Card.Body className="text-center">
                 <h5 className="mb-3">
                   <i className="bi bi-gift me-2"></i>
-                  Avantages d'un compte
+                  {t('accountBenefitsTitle')}
                 </h5>
                 <Row>
                   <Col md={4} className="mb-2">
                     <div className="text-primary">
                       <i className="bi bi-heart-fill fs-4"></i>
-                      <p className="small mb-0 mt-1">Sauvegardez vos favoris</p>
+                      <p className="small mb-0 mt-1">{t('benefitFavorites')}</p>
                     </div>
                   </Col>
                   <Col md={4} className="mb-2">
                     <div className="text-success">
                       <i className="bi bi-bell-fill fs-4"></i>
-                      <p className="small mb-0 mt-1">Notifications personnalisées</p>
+                      <p className="small mb-0 mt-1">{t('benefitNotifications')}</p>
                     </div>
                   </Col>
                   <Col md={4} className="mb-2">
                     <div className="text-info">
                       <i className="bi bi-download fs-4"></i>
-                      <p className="small mb-0 mt-1">Téléchargements exclusifs</p>
+                      <p className="small mb-0 mt-1">{t('benefitDownloads')}</p>
                     </div>
                   </Col>
                 </Row>

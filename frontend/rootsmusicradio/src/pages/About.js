@@ -103,15 +103,15 @@ const About = () => {
             <Col lg={8} className="mx-auto">
               <h1 className="display-4 mb-4">
                 <i className="bi bi-radio me-3"></i>
-                À propos de Nous
+                {t('aboutTitle')}
               </h1>
               <p className="lead">
-               ROOTS RADIO Where Everything Starts, c'est la Station de radio musicale leader au Cameroun en terme de musique urbaine. Diffusant depuis le Cameroun, plus précisément dans les villes de Yaoundé, Douala et Kribi sur la frequence FM 105.9 . Si vous aimez la musique qui tape fort, alors vous allez sûrement adorer ecouter la radio en ligne Roots Radio Cameroun partout ou vous vous trouvez. Cette radio propose une sélection de haute qualité des meilleurs artistes et sons de toute catégorie mais pas seulement. Elle diffuse également des morceaux Afro, Afro-fusion, hip-hop, Reggae, Rap ainsi que la Pop. ROOTS RADIO Cameroun vous permet d'apprécier le meilleur de la musique en faisant varier les plaisirs. Elle est entièrement gratuite et disponible depuis n'importe quel appareil connecté à internet.
+                {t('aboutDescription')}
               </p>
                <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                 <a href="/contact" className="btn btn-light btn-lg">
                   <i className="bi bi-envelope me-2"></i>
-                  Nous Contacter
+                  {t('contactUsBtn')}
                 </a>
               </div>
             </Col>
