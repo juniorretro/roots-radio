@@ -32,13 +32,13 @@ export const A = {
 
 // ── Nav config ────────────────────────────────────────────────────────────────
 export const NAV_ITEMS = [
-  { to:'/admin',              icon:'speedometer2',    label:'Tableau de bord' },
-  { to:'/admin/programs',     icon:'calendar3',       label:'Programmes'      },
-  { to:'/admin/episodes',     icon:'collection-play', label:'Épisodes'        },
-  { to:'/admin/emissions',    icon:'broadcast',       label:'Émissions'       },
-  { to:'/admin/affiches',      icon:'images',           label:'Affiches'         },
-  { to:'/admin/song-requests', icon:'music-note-beamed',label:'Demandes'        },
-  { to:'/admin/history',       icon:'clock-history',   label:'Historique'       },
+  { to:'/admin',               icon:'speedometer2',    label:'Dashboard'        },
+  { to:'/admin/programs',      icon:'calendar3',       label:'Programmes'       },
+  { to:'/admin/episodes',      icon:'collection-play', label:'Épisodes'         },
+  { to:'/admin/emissions',     icon:'broadcast',       label:'Émissions'        },
+  { to:'/admin/affiches',      icon:'images',          label:'Affiches'         },
+  { to:'/admin/song-requests', icon:'music-note-list', label:'Demandes'         },
+  { to:'/admin/carousels',     icon:'collection',      label:'Carrousels'       },
   { to:'/admin/stats',         icon:'bar-chart',       label:'Statistiques'     },
 ];
 
@@ -46,31 +46,36 @@ export const NAV_ITEMS = [
 export const AppleSidebar = () => {
   const location = useLocation();
   const active = p => location.pathname === p;
+  const dark = '#1c1c1e';
+  const darkBorder = 'rgba(255,255,255,0.08)';
+  const linkColor = (on) => on ? '#fff' : 'rgba(255,255,255,0.75)';
+  const linkBg    = (on) => on ? 'rgba(255,255,255,0.15)' : 'transparent';
+
   return (
-    <aside style={{ width:220, background:'rgba(255,255,255,0.88)', backdropFilter:'blur(20px)', borderRight:`1px solid ${A.border}`, minHeight:'100vh', position:'sticky', top:0, display:'flex', flexDirection:'column', flexShrink:0 }}>
-      <div style={{ padding:'20px 16px 16px', borderBottom:`1px solid ${A.border}` }}>
+    <aside style={{ width:220, background:dark, minHeight:'100vh', position:'sticky', top:0, display:'flex', flexDirection:'column', flexShrink:0 }}>
+      <div style={{ padding:'20px 16px 16px', borderBottom:`1px solid ${darkBorder}` }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:32, height:32, borderRadius:8, background:A.blue, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <i className="bi bi-radio" style={{ color:'#fff', fontSize:16 }} />
+          <div style={{ width:32, height:32, borderRadius:8, background:'rgba(255,255,255,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18 }}>
+            📻
           </div>
           <div>
-            <div style={{ fontSize:13, fontWeight:700, color:A.text }}>Roots Radio</div>
-            <div style={{ fontSize:11, color:A.text2 }}>Administration</div>
+            <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>Roots Radio</div>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>Administration</div>
           </div>
         </div>
       </div>
       <nav style={{ flex:1, padding:'12px 8px' }}>
-        <div style={{ fontSize:11, fontWeight:600, letterSpacing:'0.06em', textTransform:'uppercase', color:A.text3, padding:'8px 10px 4px' }}>Menu</div>
+        <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(255,255,255,0.3)', padding:'8px 10px 4px' }}>Menu</div>
         {NAV_ITEMS.map(n => (
-          <Link key={n.to} to={n.to} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 10px', marginBottom:2, borderRadius:10, fontSize:14, fontWeight:500, textDecoration:'none', background:active(n.to)?A.blue:'transparent', color:active(n.to)?'#fff':A.text, transition:'all 0.15s' }}>
+          <Link key={n.to} to={n.to} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 10px', marginBottom:2, borderRadius:10, fontSize:14, fontWeight:500, textDecoration:'none', background:linkBg(active(n.to)), color:linkColor(active(n.to)), transition:'all 0.15s' }}>
             <i className={`bi bi-${n.icon}`} style={{ fontSize:15, width:18, textAlign:'center' }} />
             {n.label}
           </Link>
         ))}
       </nav>
-      <div style={{ padding:'12px 8px', borderTop:`1px solid ${A.border}` }}>
-        <Link to="/" style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 10px', borderRadius:10, fontSize:14, fontWeight:500, textDecoration:'none', color:A.text2 }}>
-          <i className="bi bi-house" style={{ fontSize:15 }} />Retour au site
+      <div style={{ padding:'12px 8px', borderTop:`1px solid ${darkBorder}` }}>
+        <Link to="/" style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 10px', borderRadius:10, fontSize:14, fontWeight:500, textDecoration:'none', color:'rgba(255,255,255,0.55)' }}>
+          <i className="bi bi-house" style={{ fontSize:15 }} />Voir le site
         </Link>
       </div>
     </aside>

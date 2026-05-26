@@ -1869,7 +1869,7 @@ function Sidebar({ isActive, onUpload }) {
 
         <div className="apple-sidebar-section">
           <span className="apple-sidebar-section-label">Contenu</span>
-          {NAV.slice(1,7).map(n => (
+          {NAV.slice(1).map(n => (
             <Link key={n.to} to={n.to} className={`apple-nav-link ${isActive(n.to) ? 'active' : ''}`}>
               <i className={`bi ${n.icon}`} />{n.label}
             </Link>
