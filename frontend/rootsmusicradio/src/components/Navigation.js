@@ -292,7 +292,7 @@ const Navigation = () => {
                 title={
                   <span>
                     <i className="bi bi-globe me-2"></i>
-                    {i18n.language.toUpperCase()}
+                    {i18n.language.slice(0, 2).toUpperCase()}
                   </span>
                 } 
                 id="language-dropdown"
